@@ -55,9 +55,7 @@ function LandingPage() {
             />
           </Link>
           <nav className="hidden items-center gap-8 text-sm text-slate-600 md:flex">
-            <a href="#how" className="hover:text-slate-900">How it works</a>
             <a href="#features" className="hover:text-slate-900">Features</a>
-            <a href="#trust" className="hover:text-slate-900">Trust</a>
           </nav>
           <Link
             to="/compass"
@@ -103,10 +101,10 @@ function LandingPage() {
                   <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                 </Link>
                 <a
-                  href="#how"
+                  href="#features"
                   className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10"
                 >
-                  How it works
+                  See features
                 </a>
               </div>
 
@@ -227,72 +225,6 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
-        <section id="how" className="border-t border-white/5 bg-white/[0.02]">
-          <div className="mx-auto max-w-7xl px-6 py-28">
-            <div className="grid gap-12 lg:grid-cols-12">
-              <div className="lg:col-span-4">
-                <p className="text-xs uppercase tracking-[0.25em] text-[#16A34A]">The flow</p>
-                <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-                  From signal to safety in three steps.
-                </h2>
-                <p className="mt-4 text-white/60">
-                  Built for the worst day, by people who've worked it.
-                </p>
-              </div>
-              <div className="lg:col-span-8">
-                <ol className="space-y-5">
-                  {steps.map((s, i) => (
-                    <li
-                      key={s.title}
-                      className="relative flex gap-5 rounded-2xl border border-white/10 bg-[#2a3b55]/50 p-6 backdrop-blur"
-                    >
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#16A34A] text-lg font-bold text-white shadow-lg shadow-[#16A34A]/30">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">{s.title}</h3>
-                        <p className="mt-1 text-sm leading-relaxed text-white/60">{s.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* TRUST */}
-        <section id="trust" className="mx-auto max-w-7xl px-6 py-28">
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#2a3b55] to-[#1a2540] p-10 sm:p-16">
-            <div className="grid items-center gap-10 lg:grid-cols-2">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-[#16A34A]">
-                  AI you can audit
-                </p>
-                <h2 className="mt-3 text-4xl font-bold leading-tight tracking-tight">
-                  Every recommendation shows its work.
-                </h2>
-                <p className="mt-4 text-white/60">
-                  Click any route, score, or alert to see the exact signals,
-                  weights, and sources behind the call. No black boxes when
-                  it's your family.
-                </p>
-              </div>
-              <div className="space-y-3">
-                {disclosures.map((d) => (
-                  <div
-                    key={d}
-                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3"
-                  >
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-[#16A34A]" />
-                    <span className="text-sm text-white/85">{d}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* CTA */}
         <section className="mx-auto max-w-7xl px-6 pb-32">
@@ -364,24 +296,3 @@ const features = [
   },
 ];
 
-const steps = [
-  {
-    title: "Signals come in.",
-    desc: "Weather APIs, sensors, and community reports flow into one normalized stream — verified, deduped, geolocated.",
-  },
-  {
-    title: "The Compass decides.",
-    desc: "We weigh hazard severity, route safety, household needs, and shelter capacity into a single recommended action.",
-  },
-  {
-    title: "Your family moves.",
-    desc: "One clear instruction, one mapped route, one tap to coordinate with neighbors. No dashboard hunting.",
-  },
-];
-
-const disclosures = [
-  "Source feeds shown for every alert",
-  "Route scoring formula open and inspectable",
-  "Human-in-the-loop coordinator override",
-  "Model version + confidence on every call",
-];
