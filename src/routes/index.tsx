@@ -55,9 +55,7 @@ function LandingPage() {
             />
           </Link>
           <nav className="hidden items-center gap-8 text-sm text-slate-600 md:flex">
-            <a href="#how" className="hover:text-slate-900">How it works</a>
             <a href="#features" className="hover:text-slate-900">Features</a>
-            <a href="#trust" className="hover:text-slate-900">Trust</a>
           </nav>
           <Link
             to="/compass"
