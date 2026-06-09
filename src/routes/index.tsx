@@ -11,6 +11,7 @@ import {
   Activity,
   CheckCircle2,
 } from "lucide-react";
+import dcLogo from "@/assets/disaster-compass-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
