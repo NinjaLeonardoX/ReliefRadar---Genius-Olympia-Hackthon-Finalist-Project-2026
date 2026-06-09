@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X, Radar } from "lucide-react";
-import { DemoScenarioDropdown } from "./DemoScenarioDropdown";
+import { DemoScenarioDropdown, type DemoScenario } from "./DemoScenarioDropdown";
 
 const links = [
   { to: "/", label: "Home" },
