@@ -153,9 +153,9 @@ function AppChrome() {
             </div>
             <div className="ml-auto flex items-center gap-3">
               {activeScenario && (
-                <span className="hidden rounded-full bg-white/10 px-3 py-1 text-xs text-slate-100 ring-1 ring-white/10 sm:inline-flex">
+                <span className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 ring-1 ring-slate-200 sm:inline-flex">
                   Active scenario:{" "}
-                  <span className="ml-1 font-semibold text-[color:var(--severity-low)]">{activeScenario}</span>
+                  <span className="ml-1 font-semibold text-emerald-600">{activeScenario}</span>
                 </span>
               )}
             </div>
