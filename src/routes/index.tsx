@@ -46,8 +46,8 @@ function LandingPage() {
 
       <div className="relative">
         {/* NAV */}
-        <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <Link to="/" className="flex items-center rounded-lg bg-white px-2 py-1 shadow-sm ring-1 ring-white/20">
+        <header className="mx-auto flex max-w-7xl items-center justify-between rounded-b-xl bg-white/95 px-6 py-4 shadow-lg shadow-black/10 ring-1 ring-white/20 backdrop-blur">
+          <Link to="/" className="flex items-center">
             <img
               src={dcLogo.url}
               alt="DisasterCompass — Community Disaster Action Planner"
