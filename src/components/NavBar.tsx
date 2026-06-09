@@ -15,7 +15,7 @@ const links = [
 
 interface NavBarProps {
   activeScenario: string | null;
-  onSelectScenario: (s: string) => void;
+  onSelectScenario: (s: DemoScenario) => void;
 }
 
 export function NavBar({ activeScenario, onSelectScenario }: NavBarProps) {
