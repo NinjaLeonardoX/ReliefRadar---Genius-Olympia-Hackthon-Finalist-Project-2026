@@ -55,12 +55,6 @@ export function AppSidebar({ activeScenario, onSelectScenario }: AppSidebarProps
             className={`${collapsed ? "h-8 w-8 object-cover object-left" : "h-9 w-auto"} rounded-md bg-white px-1.5 py-0.5 ring-1 ring-white/15`}
           />
         </Link>
-              <p className="truncate text-[10px] uppercase tracking-wider text-slate-400">
-                Community Action Planner
-              </p>
-            </div>
-          )}
-        </Link>
         {!collapsed && (
           <div className="px-1 pb-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-200 ring-1 ring-white/10">
