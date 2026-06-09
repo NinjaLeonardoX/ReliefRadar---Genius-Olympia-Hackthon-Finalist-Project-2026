@@ -52,8 +52,8 @@ function CompassPage() {
         <Header />
         <AlertPanel />
 
-        <div className="rounded-2xl bg-card p-5 text-card-foreground shadow-md shadow-black/10">
-          <p className="text-xs font-medium uppercase tracking-wide text-card-foreground/60">
+        <div className="dc-card p-5 text-card-foreground">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
             Disaster type
           </p>
           <div className="mt-3">
