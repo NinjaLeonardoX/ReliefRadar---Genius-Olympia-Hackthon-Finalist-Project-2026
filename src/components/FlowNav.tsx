@@ -1,7 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 
-export const FLOW_STEPS = [
+interface FlowStep {
+  to: "/" | "/map" | "/report" | "/dashboard" | "/action-plan";
+  label: string;
+  short: string;
+  hub?: boolean;
+}
+
+export const FLOW_STEPS: readonly FlowStep[] = [
   { to: "/", label: "Home", short: "Home" },
   { to: "/map", label: "Map", short: "Map" },
   { to: "/report", label: "Report", short: "Report" },
@@ -9,7 +16,7 @@ export const FLOW_STEPS = [
   { to: "/action-plan", label: "Action Plan", short: "Action" },
 ] as const;
 
-export type FlowPath = (typeof FLOW_STEPS)[number]["to"];
+export type FlowPath = FlowStep["to"];
 
 interface FlowNavProps {
   currentPath: string;
