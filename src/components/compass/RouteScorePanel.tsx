@@ -131,7 +131,8 @@ export function RouteScorePanel() {
               ))}
             </dl>
           </div>
-        ))}
+          );
+        })}
       </div>
       <p className="mt-4 text-sm text-card-foreground/75">
         Best: Route B — avoids the flooded bridge and reaches higher ground.
