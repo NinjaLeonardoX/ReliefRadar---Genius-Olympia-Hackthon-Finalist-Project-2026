@@ -174,3 +174,10 @@ function HouseholdFact({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/")({
+  beforeLoad: () => {
+    throw redirect({ to: "/compass" });
+  },
+});
