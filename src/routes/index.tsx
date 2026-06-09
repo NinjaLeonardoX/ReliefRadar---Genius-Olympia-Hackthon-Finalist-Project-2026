@@ -46,22 +46,22 @@ function LandingPage() {
 
       <div className="relative">
         {/* NAV */}
-        <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <Link to="/" className="flex items-center rounded-lg bg-white px-2 py-1 shadow-sm ring-1 ring-white/20">
+        <header className="mx-auto flex max-w-7xl items-center justify-between rounded-b-xl bg-white/95 px-6 py-4 shadow-lg shadow-black/10 ring-1 ring-white/20 backdrop-blur">
+          <Link to="/" className="flex items-center">
             <img
               src={dcLogo.url}
               alt="DisasterCompass — Community Disaster Action Planner"
               className="h-10 w-auto"
             />
           </Link>
-          <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
-            <a href="#how" className="hover:text-white">How it works</a>
-            <a href="#features" className="hover:text-white">Features</a>
-            <a href="#trust" className="hover:text-white">Trust</a>
+          <nav className="hidden items-center gap-8 text-sm text-slate-600 md:flex">
+            <a href="#how" className="hover:text-slate-900">How it works</a>
+            <a href="#features" className="hover:text-slate-900">Features</a>
+            <a href="#trust" className="hover:text-slate-900">Trust</a>
           </nav>
           <Link
             to="/compass"
-            className="group inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#1e293b] shadow-lg shadow-black/30 transition hover:bg-white/90"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:brightness-110"
           >
             Open Live Demo
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
