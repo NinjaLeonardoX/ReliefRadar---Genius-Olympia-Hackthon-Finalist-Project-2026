@@ -114,15 +114,15 @@ function LandingPage() {
               <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-white/50">
                 <span className="inline-flex items-center gap-2">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#16A34A]" />
-                  Built with FEMA-aligned guidance
+                  FEMA-aligned guidance
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <Sparkles className="h-3.5 w-3.5 text-[#16A34A]" />
-                  Transparent AI reasoning
+                  Open scoring formula
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <Activity className="h-3.5 w-3.5 text-[#16A34A]" />
-                  Updates every 30s
+                  Rules-based, not a black box
                 </span>
               </div>
             </div>
