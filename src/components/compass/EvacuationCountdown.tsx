@@ -1,17 +1,68 @@
 import { useEffect, useState } from "react";
-import { Clock } from "lucide-react";
+import { Clock, Droplets, Flame, Wind, Activity, Sun } from "lucide-react";
 import type { DisasterKind } from "./DisasterPicker";
 
-// Realistic action-window per hazard (minutes until conditions become unsafe
-// to leave). Calibrated for the demo so a fresh page-load shows a healthy
-// "early" window that ticks down through "mid" and "critical".
-const WINDOW_MINUTES: Record<DisasterKind, number> = {
-  Flood: 90,
-  Wildfire: 60,
-  Hurricane: 240,
-  Earthquake: 15, // post-event safe-assembly window
-  "Extreme Heat": 180,
+// Per-hazard impact context: action window (minutes until conditions become
+// unsafe to leave), the community most likely to be hit first, and a
+// hazard-specific phrasing for the countdown header.
+interface HazardCtx {
+  windowMinutes: number;
+  community: string;
+  households: number;
+  hazardLabel: string; // e.g. "until floodwaters reach"
+  source: string; // source-of-truth attribution
+  Icon: typeof Droplets;
+  accent: string; // tailwind text color for icon
+}
+
+const HAZARD: Record<DisasterKind, HazardCtx> = {
+  Flood: {
+    windowMinutes: 90,
+    community: "North Creek (Riverside)",
+    households: 412,
+    hazardLabel: "until floodwaters reach",
+    source: "NWS gauge + county drainage model",
+    Icon: Droplets,
+    accent: "text-blue-600",
+  },
+  Wildfire: {
+    windowMinutes: 60,
+    community: "Ridge Hollow (WUI)",
+    households: 198,
+    hazardLabel: "until fire front reaches",
+    source: "CAL FIRE perimeter + wind forecast",
+    Icon: Flame,
+    accent: "text-orange-600",
+  },
+  Hurricane: {
+    windowMinutes: 240,
+    community: "Bayshore (Surge Zone A)",
+    households: 356,
+    hazardLabel: "until tropical-storm winds hit",
+    source: "NHC advisory + surge model",
+    Icon: Wind,
+    accent: "text-sky-600",
+  },
+  Earthquake: {
+    windowMinutes: 15,
+    community: "Old Town (URM block)",
+    households: 174,
+    hazardLabel: "safe-assembly window for",
+    source: "USGS ShakeAlert + city URM inventory",
+    Icon: Activity,
+    accent: "text-amber-600",
+  },
+  "Extreme Heat": {
+    windowMinutes: 180,
+    community: "Senior Village",
+    households: 142,
+    hazardLabel: "until heat index peaks for",
+    source: "NWS HeatRisk + utility load forecast",
+    Icon: Sun,
+    accent: "text-red-500",
+  },
 };
+
 
 type Phase = "early" | "mid" | "critical" | "passed";
 
