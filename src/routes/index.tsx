@@ -225,42 +225,6 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
-        <section id="how" className="border-t border-white/5 bg-white/[0.02]">
-          <div className="mx-auto max-w-7xl px-6 py-28">
-            <div className="grid gap-12 lg:grid-cols-12">
-              <div className="lg:col-span-4">
-                <p className="text-xs uppercase tracking-[0.25em] text-[#16A34A]">The flow</p>
-                <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-                  From signal to safety in three steps.
-                </h2>
-                <p className="mt-4 text-white/60">
-                  Built for the worst day, by people who've worked it.
-                </p>
-              </div>
-              <div className="lg:col-span-8">
-                <ol className="space-y-5">
-                  {steps.map((s, i) => (
-                    <li
-                      key={s.title}
-                      className="relative flex gap-5 rounded-2xl border border-white/10 bg-[#2a3b55]/50 p-6 backdrop-blur"
-                    >
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#16A34A] text-lg font-bold text-white shadow-lg shadow-[#16A34A]/30">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">{s.title}</h3>
-                        <p className="mt-1 text-sm leading-relaxed text-white/60">{s.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* TRUST */}
         <section id="trust" className="mx-auto max-w-7xl px-6 py-28">
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#2a3b55] to-[#1a2540] p-10 sm:p-16">
             <div className="grid items-center gap-10 lg:grid-cols-2">
