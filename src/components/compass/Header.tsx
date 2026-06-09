@@ -1,3 +1,4 @@
+import { ShieldCheck } from "lucide-react";
 import dcLogo from "@/assets/disaster-compass-logo-transparent.png";
 
 export function Header() {

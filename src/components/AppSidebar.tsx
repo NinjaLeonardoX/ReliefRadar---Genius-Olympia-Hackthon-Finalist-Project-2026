@@ -51,7 +51,7 @@ export function AppSidebar({ activeScenario, onSelectScenario }: AppSidebarProps
       <SidebarHeader className="border-b border-white/10 bg-[color:var(--surface)]">
         <Link to="/compass" className="flex items-center px-1 py-2">
           <img
-            src={dcLogo.url}
+            src={dcLogo}
             alt="DisasterCompass"
             className={`${collapsed ? "h-8 w-8 object-cover object-left" : "h-9 w-auto"} rounded-md bg-white px-1.5 py-0.5 ring-1 ring-white/15`}
           />

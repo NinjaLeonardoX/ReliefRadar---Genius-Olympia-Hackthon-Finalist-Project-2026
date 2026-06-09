@@ -49,7 +49,7 @@ function LandingPage() {
         <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
           <Link to="/" className="flex items-center">
             <img
-              src={dcLogo.url}
+              src={dcLogo}
               alt="DisasterCompass — Community Disaster Action Planner"
               className="h-10 w-auto rounded-md bg-white/95 px-2 py-1 ring-1 ring-white/15"
             />

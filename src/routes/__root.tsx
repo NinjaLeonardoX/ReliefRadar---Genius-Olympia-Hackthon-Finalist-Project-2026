@@ -143,7 +143,7 @@ function AppChrome() {
             <SidebarTrigger className="text-white hover:bg-white/10" />
             <div className="flex items-center gap-2">
               <img
-                src={dcLogo.url}
+                src={dcLogo}
                 alt="DisasterCompass"
                 className="h-8 w-auto rounded-md bg-white px-1.5 py-0.5 ring-1 ring-white/15"
               />
