@@ -117,26 +117,43 @@ function format(remaining: number) {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
+// Persistent per-disaster end-times so switching disasters (or any parent
+// re-render) doesn't restart the countdown. Stored at module scope on
+// purpose — the dashboard only has one of each timer.
+const endTimes = new Map<DisasterKind, number>();
+function getEndTime(disaster: DisasterKind, windowMinutes: number) {
+  let end = endTimes.get(disaster);
+  if (end === undefined || end < Date.now()) {
+    end = Date.now() + windowMinutes * 60 * 1000;
+    endTimes.set(disaster, end);
+  }
+  return end;
+}
+
 export function EvacuationCountdown({ disaster }: { disaster: DisasterKind }) {
   const ctx = HAZARD[disaster];
   const totalSeconds = ctx.windowMinutes * 60;
-  const [remaining, setRemaining] = useState(totalSeconds);
+  const endTime = getEndTime(disaster, ctx.windowMinutes);
+  const [remaining, setRemaining] = useState(() =>
+    Math.max(0, Math.round((endTime - Date.now()) / 1000)),
+  );
 
-  // Reset countdown when the disaster type changes.
+  // Re-sync from the persistent end-time whenever the disaster changes.
   useEffect(() => {
-    setRemaining(totalSeconds);
-  }, [disaster, totalSeconds]);
+    setRemaining(Math.max(0, Math.round((endTime - Date.now()) / 1000)));
+  }, [endTime]);
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setRemaining((r) => (r > 0 ? r - 1 : 0));
+      setRemaining(Math.max(0, Math.round((endTime - Date.now()) / 1000)));
     }, 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [endTime]);
 
   const phase = phaseFor(remaining, totalSeconds);
   const meta = PHASE_META[phase];
   const pct = Math.max(0, Math.min(100, (remaining / totalSeconds) * 100));
+
 
   // Compute the projected impact clock time (now + remaining).
   const impactAt = new Date(Date.now() + remaining * 1000);
