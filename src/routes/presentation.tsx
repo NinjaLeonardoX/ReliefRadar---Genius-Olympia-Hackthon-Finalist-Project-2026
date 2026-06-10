@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Compass,
   ShieldCheck,
@@ -13,6 +13,7 @@ import {
   Download,
   CheckCircle2,
   Sparkles,
+  LogOut,
 } from "lucide-react";
 import { SiteHeader } from "../components/SiteHeader";
 import dcLogo from "@/assets/disaster-compass-logo.png.asset.json";
@@ -202,7 +203,17 @@ const decisionStyles: Record<string, string> = {
 };
 
 /** A single templated slide — branded header, content, and footer. */
-function SlideView({ slide, index, total }: { slide: Slide; index: number; total: number }) {
+function SlideView({
+  slide,
+  index,
+  total,
+  onExit,
+}: {
+  slide: Slide;
+  index: number;
+  total: number;
+  onExit?: () => void;
+}) {
   if (slide.cover) {
     return (
       <div className="slide relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-[#0f1a2e] px-8 pb-24 pt-12 text-center text-white">
@@ -241,6 +252,17 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
                 </p>
               )}
             </div>
+          )}
+
+          {onExit && index === total - 1 && (
+            <button
+              type="button"
+              onClick={onExit}
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0f1a2e] shadow-lg shadow-black/30 transition hover:bg-white/90"
+            >
+              <LogOut className="h-4 w-4" />
+              Exit presentation
+            </button>
           )}
         </div>
 
@@ -484,9 +506,15 @@ function PresentationPage() {
   const [index, setIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const next = useCallback(() => setIndex((i) => Math.min(i + 1, slides.length - 1)), []);
   const prev = useCallback(() => setIndex((i) => Math.max(i - 1, 0)), []);
+
+  const exitPresentation = useCallback(() => {
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    navigate({ to: "/" });
+  }, [navigate]);
 
   const toggleFullscreen = useCallback(() => {
     const el = stageRef.current;
@@ -561,7 +589,7 @@ function PresentationPage() {
           ref={stageRef}
           className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[#0f1a2e] shadow-2xl shadow-black/30 ring-1 ring-white/10"
         >
-          <SlideView slide={slide} index={index} total={slides.length} />
+          <SlideView slide={slide} index={index} total={slides.length} onExit={exitPresentation} />
 
           {/* Prev / Next arrows */}
           <button
