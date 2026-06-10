@@ -107,7 +107,13 @@ export function RespondQuickAction() {
       })
       .catch(() => setAlertEvent("Heat Wave"));
     return () => controller.abort();
-  }, [home[0], home[1]]);
+  }, [home[0], home[1], refreshTick]);
+
+  // Re-check route + alert data every 10 seconds.
+  useEffect(() => {
+    const id = setInterval(() => setRefreshTick((t) => t + 1), 10000);
+    return () => clearInterval(id);
+  }, []);
 
   // Track when we last received a real device location.
   const [locationUpdatedAt, setLocationUpdatedAt] = useState<number | null>(null);
