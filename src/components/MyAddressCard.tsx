@@ -265,21 +265,12 @@ export function MyAddressCard() {
             <div className="flex flex-wrap gap-2">
               <button
                 disabled={busy}
-                onClick={() => handleSave(false)}
+                onClick={() => handleSave(Boolean(activeAddress))}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:brightness-110 disabled:opacity-60"
               >
                 {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-                Save as new
+                {activeAddress ? `Update "${activeAddress.name}"` : "Save location"}
               </button>
-              {activeAddress && (
-                <button
-                  disabled={busy}
-                  onClick={() => handleSave(true)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface/70 disabled:opacity-60"
-                >
-                  <Check className="h-3.5 w-3.5" /> Update "{activeAddress.name}"
-                </button>
-              )}
               {source !== "seed" && (
                 <button
                   onClick={useSeed}
