@@ -23,12 +23,34 @@ const LOCATION_TYPES = [
 const PlaceDetailsSchema = z.object({
   name: z.string(),
   address: z.string(),
-  locationType: z.enum(LOCATION_TYPES),
+  locationType: z.string(),
   city: z.string().optional(),
   state: z.string().optional(),
   country: z.string().optional(),
   notes: z.string().optional(),
 });
+
+type LocationType = (typeof LOCATION_TYPES)[number];
+
+function normalizeLocationType(raw: string): LocationType {
+  const v = (raw ?? "").trim().toLowerCase();
+  const exact = LOCATION_TYPES.find((t) => t.toLowerCase() === v);
+  if (exact) return exact;
+  if (/(college|university)/.test(v)) return "University";
+  if (/(school|academy|elementary|middle|high|k-?12)/.test(v)) return "School";
+  if (/(hospital|clinic|medical)/.test(v)) return "Hospital";
+  if (/(church|mosque|temple|synagogue|chapel|cathedral)/.test(v)) return "Church";
+  if (/library/.test(v)) return "Library";
+  if (/(community|rec center|recreation)/.test(v)) return "Community Center";
+  if (/fire/.test(v)) return "Fire Station";
+  if (/police/.test(v)) return "Police Station";
+  if (/(hotel|motel|inn|lodging|resort|airbnb)/.test(v)) return "Lodging";
+  if (/(office|workplace|corporate)/.test(v)) return "Office";
+  if (/(business|store|shop|restaurant|cafe|market)/.test(v)) return "Business";
+  if (/(home|house|residence|apartment)/.test(v)) return "Home";
+  if (/campus/.test(v)) return "Campus";
+  return "Other";
+}
 
 export const lookupPlaceDetails = createServerFn({ method: "POST" })
   .inputValidator(
@@ -49,7 +71,7 @@ User input: "${data.query}"
 Rules:
 - "name": short proper name of the place (e.g. "Lincoln High School").
 - "address": best full street address you know, including city/state/country if possible. If you only know city/region, return that.
-- "locationType": MUST be one of: ${LOCATION_TYPES.join(", ")}. Pick the closest match.
+- "locationType": pick the closest match from: ${LOCATION_TYPES.join(", ")}. If none fit, use "Other".
 - Fill city/state/country when known.
 - Do not invent fake street numbers if uncertain — leave the street out and use city/state instead.
 - Return JSON only.`;
@@ -60,7 +82,10 @@ Rules:
         prompt,
         experimental_output: Output.object({ schema: PlaceDetailsSchema }),
       });
-      return experimental_output;
+      return {
+        ...experimental_output,
+        locationType: normalizeLocationType(experimental_output.locationType),
+      };
     } catch (err) {
       console.error("AI place lookup failed", err);
       return null;
