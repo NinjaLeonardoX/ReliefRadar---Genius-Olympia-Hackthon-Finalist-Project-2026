@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      saved_addresses: {
+        Row: {
+          address: string
+          city: string | null
+          country: string | null
+          country_code: string | null
+          county: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          saved_at: string
+          state: string | null
+          state_code: string | null
+        }
+        Insert: {
+          address: string
+          city?: string | null
+          country?: string | null
+          country_code?: string | null
+          county?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          saved_at?: string
+          state?: string | null
+          state_code?: string | null
+        }
+        Update: {
+          address?: string
+          city?: string | null
+          country?: string | null
+          country_code?: string | null
+          county?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          saved_at?: string
+          state?: string | null
+          state_code?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
