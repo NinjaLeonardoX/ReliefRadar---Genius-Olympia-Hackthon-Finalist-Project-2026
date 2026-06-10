@@ -617,9 +617,25 @@ type SetupStep = "name" | "wizard" | "review" | "generating" | "generated";
 
 export function SafetyLocationPanel() {
   const { confirmLocation, setManualLocation } = useLocation();
-  const [locations, setLocations] = useState<SavedLocation[]>([MY_ADDRESS, SJFU]);
+  const [locations, setLocations] = useState<SavedLocation[]>(() => {
+    const stored = loadStoredLocations<SavedLocation>();
+    if (!stored || stored.length === 0) return [MY_ADDRESS, SJFU];
+    // Ensure the preloaded SJFU stays present even if older payloads dropped it.
+    const hasSjfu = stored.some((l) => l.id === SJFU.id);
+    const hasMyAddr = stored.some((l) => l.id === MY_ADDRESS.id);
+    const merged = [...stored];
+    if (!hasMyAddr) merged.unshift(MY_ADDRESS);
+    if (!hasSjfu) merged.push(SJFU);
+    return merged;
+  });
   const [selectedId, setSelectedId] = useState<string>(MY_ADDRESS.id);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Persist every change so readiness percentage and answers survive reloads.
+  useEffect(() => {
+    saveStoredLocations(locations);
+  }, [locations]);
+
 
   // Setup flow state
   const [setupMode, setSetupMode] = useState<SetupMode>(null);
