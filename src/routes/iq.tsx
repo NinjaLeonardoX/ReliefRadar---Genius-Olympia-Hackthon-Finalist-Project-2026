@@ -210,6 +210,8 @@ function IQEnginePage() {
         <VolunteersPanel volunteers={volunteers} setVolunteers={setVolunteers} />
       </div>
 
+      <SOSRecipientPanel />
+
       <BroadcastsPanel broadcasts={broadcasts} setBroadcasts={setBroadcasts} />
     </main>
   );
