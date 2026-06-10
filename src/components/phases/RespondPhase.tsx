@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ChevronDown, Droplets, Activity, Sun } from "lucide-react";
+import { ChevronDown, Droplets, Activity, Sun, MapPin } from "lucide-react";
 import { ActionCard } from "../compass/ActionCard";
 import { MapPanel } from "../compass/MapPanel";
 import { RouteScorePanel } from "../compass/RouteScorePanel";
@@ -9,8 +9,9 @@ import { HouseholdCard } from "../compass/HouseholdCard";
 import { DisasterPicker, type DisasterKind } from "../compass/DisasterPicker";
 import { WhyThisPopover } from "../WhyThisPopover";
 import { WeatherCard } from "../WeatherCard";
+import { RollupPanel } from "../RollupPanel";
 import { usePhase } from "../PhaseContext";
-import { useHousehold } from "../LocationContext";
+import { useHousehold, useLocation } from "../LocationContext";
 import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
 
 export function RespondPhase() {
@@ -19,15 +20,20 @@ export function RespondPhase() {
   const [scoresOpen, setScoresOpen] = useState(true);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const { mode } = usePhase();
+  const household = useHousehold();
+  const { source, resolved } = useLocation();
   const actionRef = useRef<HTMLDivElement>(null);
 
   // Same live-or-seed routing the /map page uses, so the polished flow shows
   // real scores and real geometry. Flag off ⇒ seed routes (48 / 91 / 70).
-  const household = useHousehold();
   const home: [number, number] = [household.lat, household.lng];
   const destShelter = resolveDestinationShelter();
   const dest: [number, number] = destShelter ? [destShelter.lat, destShelter.lng] : home;
   const { data: routes, source: routeSource } = useRoutes(home, dest);
+
+  const scopeLabel = resolved?.city
+    ? `${resolved.city}${resolved.state ? `, ${resolved.state}` : ""}`
+    : household.locationName;
 
   return (
     <div className="space-y-6">
@@ -48,6 +54,22 @@ export function RespondPhase() {
           fallback="If shelter is full, recommend next-best high-elevation, accessible, pet-friendly shelter."
         />
       </div>
+
+      <div className="dc-card flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-xs">
+        <span className="inline-flex items-center gap-1.5 font-medium text-card-foreground/75">
+          <MapPin className="h-3.5 w-3.5 text-[color:var(--severity-low)]" />
+          Plan scope: <span className="font-semibold text-foreground">{scopeLabel}</span>
+        </span>
+        <span className="text-card-foreground/55">
+          {source === "saved"
+            ? "Following your saved household"
+            : source === "device"
+              ? "Following your device location"
+              : "Demo scope — set your address to personalize"}
+        </span>
+      </div>
+
+      <RollupPanel />
 
       <div className="dc-card p-4">
         <DisasterPicker selected={disaster} onSelect={setDisaster} />
