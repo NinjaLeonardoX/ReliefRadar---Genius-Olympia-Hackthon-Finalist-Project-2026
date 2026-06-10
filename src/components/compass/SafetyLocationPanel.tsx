@@ -407,12 +407,12 @@ interface TypeCopy {
 const TYPE_COPY: Record<TypeGroup, TypeCopy> = {
   home: {
     groupNoun: "household",
-    peopleTab: "Household",
+    peopleTab: "Residence",
     peopleHeading: "Who lives here",
     peopleIntro: "Who needs to be accounted for when an alert fires — family, pets, and access needs.",
-    baseTitle: "Household Profile",
-    baseIntro: "Tell us about the people, pets, and access needs in your household so the plan accounts for everyone.",
-    planIntro: "Your household Compass Plan is ready. Review routes, fix gaps, or print the guide.",
+    baseTitle: "Residence Profile",
+    baseIntro: "Tell us about the people, pets, and access needs in your residence so the plan accounts for everyone.",
+    planIntro: "Your residence Compass Plan is ready. Review routes, fix gaps, or print the guide.",
     attrs: [
       { Icon: Users, label: "5 people" },
       { Icon: UserRound, label: "Elderly 1" },
