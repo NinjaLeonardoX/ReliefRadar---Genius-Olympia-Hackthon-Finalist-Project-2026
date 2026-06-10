@@ -37,7 +37,7 @@ const ACTIONS: ActionDef[] = [
     Icon: ShieldCheck,
     className:
       "bg-[color:var(--severity-low)] text-white hover:bg-[color:var(--severity-low)]/90 focus-visible:ring-[color:var(--severity-low)]",
-    message: "Great — stay safe!",
+    message: "Glad you are safe!",
   },
   {
     id: "sos",
@@ -45,7 +45,7 @@ const ACTIONS: ActionDef[] = [
     Icon: Siren,
     className:
       "bg-[color:var(--severity-critical)] text-white hover:bg-[color:var(--severity-critical)]/90 focus-visible:ring-[color:var(--severity-critical)] ring-2 ring-[color:var(--severity-critical)]/40",
-    message: "SOS sent to coordinator. Call 911 for life-threatening emergencies.",
+    message: "Sent",
   },
 ];
 
