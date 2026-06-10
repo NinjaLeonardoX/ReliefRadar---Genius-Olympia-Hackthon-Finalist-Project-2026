@@ -939,7 +939,7 @@ function SOSRecipientPanel() {
       </div>
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="text-xs text-card-foreground/70">
-          Preview: <span className="font-semibold text-foreground">Sent to {formatSOSRecipient(recipient)}</span>
+          Preview: <span className="font-semibold text-foreground">Sent to {formatSOSMessage(recipient)}</span>
         </p>
         <button
           type="button"
