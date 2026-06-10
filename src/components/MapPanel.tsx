@@ -12,8 +12,8 @@ import {
 import { flags } from "@/lib/flags";
 import { useHousehold } from "./LocationContext";
 
-// Browser-sent (VITE_) tile key — domain-restrict it in the MapTiler dashboard.
-const maptilerKey = import.meta.env.VITE_MAPTILER_KEY as string | undefined;
+// MapTiler key is server-only (process.env.MAPTILER_KEY). Tiles are proxied
+// through /api/tiles/{z}/{x}/{y}.png so the key never reaches the browser.
 
 // Client-only Leaflet map. This module is dynamically imported (see
 // src/routes/map.tsx) so Leaflet's `window` access never runs during SSR.
@@ -76,10 +76,10 @@ export default function MapPanel({
         scrollWheelZoom={false}
         style={{ height, width: "100%", borderRadius: "1rem" }}
       >
-        {flags.tiles && maptilerKey ? (
+        {flags.tiles ? (
           <TileLayer
             attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url={`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${maptilerKey}`}
+            url="/api/tiles/{z}/{x}/{y}.png"
           />
         ) : (
           <TileLayer
