@@ -1298,6 +1298,7 @@ function SetupModal(p: SetupModalProps) {
       return `Step ${p.wizardIndex + 1} of ${totalSteps} · ${section.title}`;
     }
     if (p.step === "review") return `Step 8 of ${totalSteps} · Review Score`;
+    if (p.step === "generating") return `Step 9 of ${totalSteps} · Generating Compass Plan`;
     return `Step 9 of ${totalSteps} · Compass Plan`;
   })();
 
