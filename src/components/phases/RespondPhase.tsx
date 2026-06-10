@@ -46,9 +46,26 @@ export function RespondPhase() {
         />
       </div>
 
+      <div className="dc-card flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-xs">
+        <span className="inline-flex items-center gap-1.5 font-medium text-card-foreground/75">
+          <MapPin className="h-3.5 w-3.5 text-[color:var(--severity-low)]" />
+          Plan scope: <span className="font-semibold text-foreground">{scopeLabel}</span>
+        </span>
+        <span className="text-card-foreground/55">
+          {source === "saved"
+            ? "Following your saved household"
+            : source === "device"
+              ? "Following your device location"
+              : "Demo scope — set your address to personalize"}
+        </span>
+      </div>
+
+      <RollupPanel />
+
       <div className="dc-card p-4">
         <DisasterPicker selected={disaster} onSelect={setDisaster} />
       </div>
+
 
       <div className="grid gap-6 lg:grid-cols-5 lg:items-stretch">
         <div className="lg:col-span-3">
