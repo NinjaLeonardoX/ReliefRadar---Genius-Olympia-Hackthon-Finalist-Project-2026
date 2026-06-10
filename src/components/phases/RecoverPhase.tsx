@@ -118,7 +118,7 @@ export function RecoverPhase() {
                 <div>
                   <p className="font-semibold text-[color:var(--severity-low)]">Recovery packet complete.</p>
                   <p className="text-sm text-card-foreground/75">
-                    All recovery steps logged for the Rivera Family.
+                    All recovery steps logged for {householdLabel}.
                   </p>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export function RecoverPhase() {
               <PackageCheck className="h-4 w-4 text-[color:var(--severity-low)]" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Recovery packet</h3>
             </div>
-            <p className="mt-2 text-base font-bold tracking-tight">Rivera Family</p>
+            <p className="mt-2 text-base font-bold tracking-tight">{householdLabel}</p>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-card-foreground/65">Status</dt>
