@@ -32,7 +32,6 @@ import {
   LocateFixed,
   Truck,
   Hammer,
-  type LucideIcon,
   Radio,
   Megaphone,
   Globe,
