@@ -93,9 +93,9 @@ const DEFAULT_WEIGHTS: Weights = {
 };
 
 const SEED_BEACONS: Beacon[] = [
-  { id: "b1", what: "Drinking water", where: "Maple St & 4th", urgency: "Urgent", status: "Open", createdAt: Date.now() - 9e5 },
-  { id: "b2", what: "Medicine pickup", where: "Oak Ave & 3rd", urgency: "Urgent", status: "Matched", helper: "Ana", createdAt: Date.now() - 6e5 },
-  { id: "b3", what: "Wellness check", where: "Pine Road", urgency: "Soon", status: "Open", createdAt: Date.now() - 3e5 },
+  { id: "b1", what: "Drinking water", where: "Maple St & 4th", urgency: "Urgent", status: "Open", createdAt: 0 },
+  { id: "b2", what: "Medicine pickup", where: "Oak Ave & 3rd", urgency: "Urgent", status: "Matched", helper: "Ana", createdAt: 0 },
+  { id: "b3", what: "Wellness check", where: "Pine Road", urgency: "Soon", status: "Open", createdAt: 0 },
 ];
 
 const SEED_VOLUNTEERS: Volunteer[] = [
