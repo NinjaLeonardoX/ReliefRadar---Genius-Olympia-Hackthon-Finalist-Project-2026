@@ -8,6 +8,7 @@ import {
   Building2,
   Landmark,
   Globe,
+  type LucideIcon,
 } from "lucide-react";
 import { HouseholdCard } from "../compass/HouseholdCard";
 import { SafetyLocationPanel } from "../compass/SafetyLocationPanel";
@@ -64,8 +65,6 @@ export function PreparePhase() {
   const [rideMatchOpen, setRideMatchOpen] = useState(false);
 
   const readiness = useMemo(() => Math.round((closed.size / PREPARE_GAPS.length) * 100), [closed]);
-
-  const selectedHazard = getHazard(selectedId);
 
   function closeGap(id: string) {
     setClosed((s) => new Set(s).add(id));
