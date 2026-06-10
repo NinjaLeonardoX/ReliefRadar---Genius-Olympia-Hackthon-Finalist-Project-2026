@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ShieldCheck, AlertCircle, LifeBuoy, Siren, MapPin, Loader2 } from "lucide-react";
 import { MapPanel } from "../compass/MapPanel";
 import { useLocation } from "../LocationContext";
-import { fetchAlertsByPoint, type NwsAlert } from "@/lib/nwsAlerts";
+import { fetchAlertsByPoint, fetchAlertsByState, type NwsAlert } from "@/lib/nwsAlerts";
 import { useEvacuationRoutes } from "@/lib/queries/evacuation";
 import type { DisasterType } from "@/types";
 
@@ -69,6 +69,7 @@ export function RespondQuickAction() {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [alertState, setAlertState] = useState<AlertState>("idle");
   const [activeAlert, setActiveAlert] = useState<NwsAlert | null>(null);
+  const [alertScope, setAlertScope] = useState<"local" | "state" | null>(null);
 
   const {
     household,
@@ -76,6 +77,7 @@ export function RespondQuickAction() {
     status: geoStatus,
     error: geoError,
     accuracyMeters,
+    resolved,
     requestLocation,
   } = useLocation();
 
@@ -96,23 +98,35 @@ export function RespondQuickAction() {
   useEffect(() => {
     if (!hasRealLocation) {
       setActiveAlert(null);
+      setAlertScope(null);
       setAlertState("idle");
       return;
     }
     const ctrl = new AbortController();
     setAlertState("loading");
-    fetchAlertsByPoint(household.lat, household.lng, ctrl.signal).then((result) => {
+    fetchAlertsByPoint(household.lat, household.lng, ctrl.signal).then(async (result) => {
       if (ctrl.signal.aborted) return;
       if (!result) {
         setActiveAlert(null);
+        setAlertScope(null);
         setAlertState("error");
         return;
       }
-      setActiveAlert(result.alerts[0] ?? null);
+      if (result.alerts[0]) {
+        setActiveAlert(result.alerts[0]);
+        setAlertScope("local");
+        setAlertState("ready");
+        return;
+      }
+      const stateCode = resolved?.stateCode;
+      const stateResult = stateCode ? await fetchAlertsByState(stateCode, ctrl.signal) : null;
+      if (ctrl.signal.aborted) return;
+      setActiveAlert(stateResult?.alerts[0] ?? null);
+      setAlertScope(stateResult?.alerts[0] ? "state" : null);
       setAlertState("ready");
     });
     return () => ctrl.abort();
-  }, [hasRealLocation, household.lat, household.lng]);
+  }, [hasRealLocation, household.lat, household.lng, resolved?.stateCode]);
 
   useEffect(() => {
     const best = routes.find((route) => route.colorType === "safe") ?? routes[0];
