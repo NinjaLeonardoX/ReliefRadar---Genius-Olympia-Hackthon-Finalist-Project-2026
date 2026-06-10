@@ -844,12 +844,13 @@ function BroadcastsPanel({
 // SOS recipient configuration
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type SOSRecipient = { title: string; name: string; organization: string };
+export type SOSRecipient = { title: string; name: string; organization: string; phone: string };
 
 export const DEFAULT_SOS_RECIPIENT: SOSRecipient = {
   title: "Chief",
   name: "Milo",
   organization: "Firestation 80",
+  phone: "",
 };
 
 export function readSOSRecipient(): SOSRecipient {
@@ -861,6 +862,7 @@ export function readSOSRecipient(): SOSRecipient {
         title: parsed.title?.trim() || DEFAULT_SOS_RECIPIENT.title,
         name: parsed.name?.trim() || DEFAULT_SOS_RECIPIENT.name,
         organization: parsed.organization?.trim() || DEFAULT_SOS_RECIPIENT.organization,
+        phone: parsed.phone?.trim() ?? "",
       };
     }
   } catch {
@@ -871,6 +873,11 @@ export function readSOSRecipient(): SOSRecipient {
 
 export function formatSOSRecipient(r: SOSRecipient): string {
   return `${r.title} ${r.name} of ${r.organization}`.replace(/\s+/g, " ").trim();
+}
+
+export function formatSOSMessage(r: SOSRecipient): string {
+  const base = formatSOSRecipient(r);
+  return r.phone ? `${base} — ${r.phone}` : base;
 }
 
 function SOSRecipientPanel() {
@@ -892,7 +899,7 @@ function SOSRecipientPanel() {
         When someone taps <span className="font-semibold">Send SOS</span> in Respond, the confirmation will read
         "Sent to {formatSOSRecipient(recipient)}".
       </p>
-      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+      <div className="mt-3 grid gap-2 sm:grid-cols-4">
         <label className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/60">
           Title / Designation
           <input
@@ -920,10 +927,19 @@ function SOSRecipientPanel() {
             className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-normal normal-case tracking-normal text-foreground"
           />
         </label>
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/60">
+          Cellphone
+          <input
+            value={recipient.phone}
+            onChange={(e) => update("phone", e.target.value)}
+            placeholder="+1 (555) 123-4567"
+            className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-normal normal-case tracking-normal text-foreground"
+          />
+        </label>
       </div>
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="text-xs text-card-foreground/70">
-          Preview: <span className="font-semibold text-foreground">Sent to {formatSOSRecipient(recipient)}</span>
+          Preview: <span className="font-semibold text-foreground">Sent to {formatSOSMessage(recipient)}</span>
         </p>
         <button
           type="button"

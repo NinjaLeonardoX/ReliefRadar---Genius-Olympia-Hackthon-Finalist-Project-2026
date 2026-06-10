@@ -6,7 +6,7 @@ import { useLocation } from "../LocationContext";
 import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
 import { SHELTERS } from "@/data/seed";
 import type { Shelter } from "@/types";
-import { readSOSRecipient, formatSOSRecipient } from "@/routes/iq";
+import { readSOSRecipient, formatSOSMessage } from "@/routes/iq";
 
 // Haversine distance in km between two [lat, lng] points.
 function distanceKm(a: [number, number], b: [number, number]): number {
@@ -106,7 +106,7 @@ export function RespondQuickAction() {
   const onAction = (a: ActionDef) => {
     setStatus(a.id);
     if (a.id === "sos") {
-      setLastMessage(`Sent to ${formatSOSRecipient(readSOSRecipient())}`);
+      setLastMessage(`Sent to ${formatSOSMessage(readSOSRecipient())}`);
     } else {
       setLastMessage(a.message);
     }
