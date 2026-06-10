@@ -11,10 +11,23 @@ import type { RouteOption } from "@/types";
 const METERS_PER_MILE = 1609.34;
 
 /** Shape of the slice of the ORS GeoJSON response we consume. */
+export interface OrsStep {
+  distance?: number; // meters
+  duration?: number; // seconds
+  type?: number;
+  instruction?: string;
+  name?: string;
+}
+export interface OrsSegment {
+  steps?: OrsStep[];
+}
 export interface OrsResponse {
   features?: Array<{
     geometry?: { coordinates?: [number, number][] }; // [lng, lat] pairs
-    properties?: { summary?: { distance?: number; duration?: number } };
+    properties?: {
+      summary?: { distance?: number; duration?: number };
+      segments?: OrsSegment[];
+    };
   }>;
 }
 
