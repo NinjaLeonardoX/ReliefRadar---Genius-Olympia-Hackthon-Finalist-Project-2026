@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { AlertTriangle, ShieldCheck, AlertCircle, LifeBuoy, Siren } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, ShieldCheck, AlertCircle, LifeBuoy, Siren, MapPin, Loader2 } from "lucide-react";
 import { MapPanel } from "../compass/MapPanel";
-import { useHousehold } from "../LocationContext";
+import { useLocation } from "../LocationContext";
 import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
 
 type Status = "none" | "safe" | "stuck" | "needs_help" | "sos";
@@ -54,7 +54,24 @@ export function RespondQuickAction() {
   const [lastMessage, setLastMessage] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
-  const household = useHousehold();
+  const {
+    household,
+    source,
+    status: geoStatus,
+    error: geoError,
+    accuracyMeters,
+    requestLocation,
+  } = useLocation();
+
+  // Auto-request real-time device location on mount if we don't have it yet.
+  useEffect(() => {
+    if (source !== "device" && (geoStatus === "idle" || geoStatus === "denied" || geoStatus === "error")) {
+      requestLocation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const hasRealLocation = source === "device";
   const home: [number, number] = [household.lat, household.lng];
   const destShelter = resolveDestinationShelter();
   const dest: [number, number] = destShelter ? [destShelter.lat, destShelter.lng] : home;
@@ -90,12 +107,58 @@ export function RespondQuickAction() {
         </div>
       </div>
 
+      {/* Real-time location status */}
+      <div
+        className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-sm shadow-sm ${
+          hasRealLocation
+            ? "border-[color:var(--severity-low)]/40 bg-[color:var(--severity-low)]/10 text-foreground"
+            : "border-border bg-white text-foreground/80"
+        }`}
+      >
+        <div className="flex min-w-0 items-center gap-2">
+          {geoStatus === "prompting" ? (
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+          ) : (
+            <MapPin
+              className={`h-4 w-4 shrink-0 ${hasRealLocation ? "text-[color:var(--severity-low)]" : "text-foreground/60"}`}
+              aria-hidden="true"
+            />
+          )}
+          <span className="truncate font-medium">
+            {hasRealLocation
+              ? `Live location · ±${Math.round(accuracyMeters ?? 0)} m`
+              : geoStatus === "prompting"
+                ? "Getting your location…"
+                : geoStatus === "denied"
+                  ? "Location permission denied"
+                  : geoStatus === "unsupported"
+                    ? "Geolocation not supported"
+                    : geoError ?? "Location not shared"}
+          </span>
+        </div>
+        {!hasRealLocation && geoStatus !== "prompting" && (
+          <button
+            type="button"
+            onClick={requestLocation}
+            className="shrink-0 rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:opacity-90"
+          >
+            Use my location
+          </button>
+        )}
+      </div>
+
       {/* Map */}
       <MapPanel
         disaster="Flood"
         routes={routes}
         selectedRouteId={selectedRouteId}
         onSelectRoute={setSelectedRouteId}
+        locationAware={hasRealLocation}
+        destinations={
+          hasRealLocation && destShelter
+            ? [{ id: destShelter.id, name: destShelter.name, lat: destShelter.lat, lng: destShelter.lng }]
+            : undefined
+        }
       />
 
       {/* Status confirmation */}
