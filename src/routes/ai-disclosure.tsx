@@ -15,7 +15,7 @@ export const Route = createFileRoute("/ai-disclosure")({
 const tools: { name: string; did: string }[] = [
   {
     name: "Lovable",
-    did: "UI and project scaffolding, edge functions, data operations to Supabase, and various functionalities.",
+    did: "UI and project scaffolding, edge functions, data to Supabase operations and various functionalities.",
   },
   {
     name: "Claude Code",
@@ -27,7 +27,7 @@ const tools: { name: string; did: string }[] = [
   },
   {
     name: "Claude",
-    did: "Assisted with planning, architecture, and coordinating the build.",
+    did: "Advised on architecture, provided focused code snippets, and assisted with prose.",
   },
   {
     name: "FlowScholar",
