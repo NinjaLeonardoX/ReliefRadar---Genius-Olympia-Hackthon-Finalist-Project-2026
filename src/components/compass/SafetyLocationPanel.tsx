@@ -1,8 +1,10 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useLocation } from "../LocationContext";
 import { usePhase } from "../PhaseContext";
-import { forwardGeocode, type GeocodeResult } from "@/lib/geocoding";
+import { forwardGeocode, inferLocationType, type GeocodeResult, type PlaceSuggestion } from "@/lib/geocoding";
 import { HAZARD_RISKS, SEVERITY_META, type HazardRisk } from "@/data/prepare";
+import { generateCompassPlan } from "@/lib/compass-plan.functions";
+import { PlaceAutocomplete } from "./PlaceAutocomplete";
 
 const PrepareRiskMap = lazy(() => import("./PrepareRiskMap"));
 import { RouteTrainingPanel } from "./RouteTrainingPanel";
