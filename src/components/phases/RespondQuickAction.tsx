@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ShieldCheck, AlertCircle, LifeBuoy, Siren, MapPin, Loader2 } from "lucide-react";
 import { MapPanel } from "../compass/MapPanel";
 import { useLocation } from "../LocationContext";
-import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
+import { fetchAlertsByPoint, type NwsAlert } from "@/lib/nwsAlerts";
+import { useEvacuationRoutes } from "@/lib/queries/evacuation";
+import type { DisasterType } from "@/types";
 
 type Status = "none" | "safe" | "stuck" | "needs_help" | "sos";
+type AlertState = "idle" | "loading" | "ready" | "error";
 
 interface ActionDef {
   id: Exclude<Status, "none">;
@@ -49,10 +52,23 @@ const ACTIONS: ActionDef[] = [
   },
 ];
 
+function disasterFromAlert(alert: NwsAlert | null): { type: DisasterType; label: "Flood" | "Earthquake" | "Wildfire" | "Hurricane" | "Extreme Heat" } {
+  const event = alert?.event.toLowerCase() ?? "";
+  if (event.includes("heat")) return { type: "heat", label: "Extreme Heat" };
+  if (event.includes("fire") || event.includes("smoke")) return { type: "wildfire", label: "Wildfire" };
+  if (event.includes("hurricane") || event.includes("tropical") || event.includes("tornado") || event.includes("wind")) {
+    return { type: "hurricane", label: "Hurricane" };
+  }
+  if (event.includes("earthquake")) return { type: "earthquake", label: "Earthquake" };
+  return { type: "flood", label: "Flood" };
+}
+
 export function RespondQuickAction() {
   const [status, setStatus] = useState<Status>("none");
   const [lastMessage, setLastMessage] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [alertState, setAlertState] = useState<AlertState>("idle");
+  const [activeAlert, setActiveAlert] = useState<NwsAlert | null>(null);
 
   const {
     household,
@@ -73,9 +89,35 @@ export function RespondQuickAction() {
 
   const hasRealLocation = source === "device";
   const home: [number, number] = [household.lat, household.lng];
-  const destShelter = resolveDestinationShelter();
-  const dest: [number, number] = destShelter ? [destShelter.lat, destShelter.lng] : home;
-  const { data: routes } = useRoutes(home, dest);
+  const currentDisaster = useMemo(() => disasterFromAlert(activeAlert), [activeAlert]);
+  const evacuation = useEvacuationRoutes(home, currentDisaster.type, hasRealLocation);
+  const routes = hasRealLocation ? evacuation.routes : [];
+
+  useEffect(() => {
+    if (!hasRealLocation) {
+      setActiveAlert(null);
+      setAlertState("idle");
+      return;
+    }
+    const ctrl = new AbortController();
+    setAlertState("loading");
+    fetchAlertsByPoint(household.lat, household.lng, ctrl.signal).then((result) => {
+      if (ctrl.signal.aborted) return;
+      if (!result) {
+        setActiveAlert(null);
+        setAlertState("error");
+        return;
+      }
+      setActiveAlert(result.alerts[0] ?? null);
+      setAlertState("ready");
+    });
+    return () => ctrl.abort();
+  }, [hasRealLocation, household.lat, household.lng]);
+
+  useEffect(() => {
+    const best = routes.find((route) => route.colorType === "safe") ?? routes[0];
+    setSelectedRouteId(best?.id ?? null);
+  }, [routes]);
 
   const onAction = (a: ActionDef) => {
     setStatus(a.id);
