@@ -1424,16 +1424,20 @@ function NameStep(p: SetupModalProps) {
       </label>
 
       {p.mode === "manual" && (
-        <label className="flex flex-col gap-1">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-black">Address or area</span>
-          <input
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-black">
+            Address, school, business, or landmark
+          </span>
+          <PlaceAutocomplete
             value={p.draftArea}
-            onChange={(e) => p.onChangeArea(e.target.value)}
-            maxLength={200}
-            placeholder="123 Main St, City, State"
-            className="rounded-md border border-border bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/50"
+            onChange={p.onChangeArea}
+            onSelect={p.onSelectPlace}
+            placeholder="Try a school, hospital, business, or address…"
           />
-        </label>
+          <span className="text-[11px] text-black/60">
+            Pick a result to auto-fill the location type and coordinates.
+          </span>
+        </div>
       )}
 
       <label className="flex flex-col gap-1">
