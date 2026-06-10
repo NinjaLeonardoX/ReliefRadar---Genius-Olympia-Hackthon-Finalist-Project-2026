@@ -923,10 +923,10 @@ ${planBlocks}
                         role="tab"
                         aria-selected={active}
                         onClick={() => setBodyTab(t.id)}
-                        className={`-mb-px rounded-t-md border-b-2 px-3 py-1.5 text-xs font-semibold transition-colors ${
+                        className={`-mb-px rounded-t-md border-b-2 px-3 py-1.5 text-xs font-semibold text-black transition-colors ${
                           active
-                            ? "border-black text-black"
-                            : "border-transparent text-black/60 hover:text-black"
+                            ? "border-black"
+                            : "border-transparent hover:border-black/40"
                         }`}
                       >
                         {t.label}
