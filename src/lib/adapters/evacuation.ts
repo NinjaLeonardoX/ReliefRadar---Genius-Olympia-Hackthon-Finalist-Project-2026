@@ -1,4 +1,4 @@
-import type { DisasterType, RouteOption } from "@/types";
+import type { DisasterType, RouteOption, RouteStep } from "@/types";
 import type { OrsResponse } from "./routing";
 
 // Pure helpers for the location-aware evacuation flow. No network, no React.
