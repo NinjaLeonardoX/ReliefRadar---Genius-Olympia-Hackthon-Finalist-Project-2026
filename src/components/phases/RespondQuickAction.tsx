@@ -63,33 +63,11 @@ export function RespondQuickAction() {
   const hasRealLocation = source === "device";
   const home: [number, number] = [household.lat, household.lng];
 
-  // Pick the nearest seed shelter as the destination. Falls back to the
-  // scenario's default destination (Hilltop) when no shelters are nearby.
-  const nearestShelter: Shelter | undefined = useMemo(() => {
-    if (SHELTERS.length === 0) return resolveDestinationShelter();
-    let best = SHELTERS[0];
-    let bestD = distanceKm(home, [best.lat, best.lng]);
-    for (const s of SHELTERS.slice(1)) {
-      const d = distanceKm(home, [s.lat, s.lng]);
-      if (d < bestD) {
-        best = s;
-        bestD = d;
-      }
-    }
-    return best;
-  }, [home[0], home[1]]);
+  // Location-aware evacuation: synthesize safe destinations near the real
+  // origin and route via ORS (or honest straight-line fallback). Always yields
+  // a line, regardless of how far the user is from the seed scenario.
+  const { routes, destinations } = useEvacuationRoutes(home, "flood", true);
 
-  const destShelter = nearestShelter ?? resolveDestinationShelter();
-  const dest: [number, number] = destShelter ? [destShelter.lat, destShelter.lng] : home;
-
-  // Avoid attempting a live cross-country route (e.g. user in NY → seed
-  // shelter in Boulder); routing only makes sense within ~150 km.
-  const destReachable = destShelter
-    ? distanceKm(home, [destShelter.lat, destShelter.lng]) < 150
-    : false;
-  const routingDest: [number, number] = destReachable ? dest : home;
-  const { data: routes } = useRoutes(home, routingDest);
-  const mapRoutes = hasRealLocation && !destReachable ? [] : routes;
 
   const onAction = (a: ActionDef) => {
     setStatus(a.id);
