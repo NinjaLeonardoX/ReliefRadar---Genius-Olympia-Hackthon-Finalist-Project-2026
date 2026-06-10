@@ -6,11 +6,14 @@ import {
   FLOOD_POLYGON,
   MAP_CENTER,
   MAP_ZOOM,
-  RIVERA_HOUSEHOLD,
-  ROUTES,
   SHELTERS,
   VOLUNTEERS,
 } from "@/data/seed";
+import { flags } from "@/lib/flags";
+import { useHousehold } from "./LocationContext";
+
+// Browser-sent (VITE_) tile key — domain-restrict it in the MapTiler dashboard.
+const maptilerKey = import.meta.env.VITE_MAPTILER_KEY as string | undefined;
 
 // Client-only Leaflet map. This module is dynamically imported (see
 // src/routes/map.tsx) so Leaflet's `window` access never runs during SSR.
@@ -24,26 +27,45 @@ const ROUTE_COLORS: Record<RouteOption["colorType"], string> = {
 };
 
 interface MapPanelProps {
+  /** Routes to draw — seed ROUTES when offline, live geometry when routing is on. */
+  routes: RouteOption[];
   selectedRouteId: string | null;
   onSelectRoute: (id: string) => void;
+  /** CSS height of the map (default 520px). */
+  height?: string;
 }
 
-export default function MapPanel({ selectedRouteId, onSelectRoute }: MapPanelProps) {
+export default function MapPanel({
+  routes,
+  selectedRouteId,
+  onSelectRoute,
+  height = "520px",
+}: MapPanelProps) {
+  const household = useHousehold();
   const hilltop = SHELTERS.find((s) => s.id === "shelter-hilltop")!;
   const ana = VOLUNTEERS.find((v) => v.id === "vol-ana")!;
+  const center: [number, number] =
+    household.lat && household.lng ? [household.lat, household.lng] : MAP_CENTER;
 
   return (
     <div className="relative">
       <MapContainer
-        center={MAP_CENTER}
+        center={center}
         zoom={MAP_ZOOM}
         scrollWheelZoom={false}
-        style={{ height: "520px", width: "100%", borderRadius: "1rem" }}
+        style={{ height, width: "100%", borderRadius: "1rem" }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {flags.tiles && maptilerKey ? (
+          <TileLayer
+            attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url={`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${maptilerKey}`}
+          />
+        ) : (
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+        )}
 
         {/* Flood area */}
         <Polygon
@@ -65,7 +87,7 @@ export default function MapPanel({ selectedRouteId, onSelectRoute }: MapPanelPro
         ))}
 
         {/* Routes — rejected first so safe/caution draw on top */}
-        {[...ROUTES]
+        {[...routes]
           .sort((a) => (a.colorType === "rejected" ? -1 : 1))
           .map((route) => {
             const selected = route.id === selectedRouteId;
@@ -88,12 +110,12 @@ export default function MapPanel({ selectedRouteId, onSelectRoute }: MapPanelPro
 
         {/* Home marker */}
         <CircleMarker
-          center={[RIVERA_HOUSEHOLD.lat, RIVERA_HOUSEHOLD.lng]}
+          center={[household.lat, household.lng]}
           radius={9}
           pathOptions={{ color: "#ffffff", weight: 2, fillColor: "#0EA5A4", fillOpacity: 1 }}
         >
           <Tooltip permanent direction="top" offset={[0, -8]}>
-            🏠 {RIVERA_HOUSEHOLD.name}
+            🏠 {household.name}
           </Tooltip>
         </CircleMarker>
 

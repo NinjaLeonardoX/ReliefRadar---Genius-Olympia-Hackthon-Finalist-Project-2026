@@ -1,24 +1,39 @@
 import { useRef, useState } from "react";
-import { ChevronDown, Droplets, Activity, Sun } from "lucide-react";
+import { ChevronDown, Droplets, Activity, Sun, MapPin } from "lucide-react";
 import { ActionCard } from "../compass/ActionCard";
 import { MapPanel } from "../compass/MapPanel";
 import { RouteScorePanel } from "../compass/RouteScorePanel";
 import { VolunteerMatchCard } from "../compass/VolunteerMatchCard";
 import { CoordinatorPanel } from "../compass/CoordinatorPanel";
 import { HouseholdCard } from "../compass/HouseholdCard";
-import {
-  DisasterPicker,
-  type DisasterKind,
-} from "../compass/DisasterPicker";
+import { DisasterPicker, type DisasterKind } from "../compass/DisasterPicker";
 import { WhyThisPopover } from "../WhyThisPopover";
+import { WeatherCard } from "../WeatherCard";
+import { RollupPanel } from "../RollupPanel";
 import { usePhase } from "../PhaseContext";
+import { useHousehold, useLocation } from "../LocationContext";
+import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
 
 export function RespondPhase() {
   const [disaster, setDisaster] = useState<DisasterKind>("Flood");
   const [volunteerApproved, setVolunteerApproved] = useState(false);
   const [scoresOpen, setScoresOpen] = useState(true);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const { mode } = usePhase();
+  const household = useHousehold();
+  const { source, resolved } = useLocation();
   const actionRef = useRef<HTMLDivElement>(null);
+
+  // Same live-or-seed routing the /map page uses, so the polished flow shows
+  // real scores and real geometry. Flag off ⇒ seed routes (48 / 91 / 70).
+  const home: [number, number] = [household.lat, household.lng];
+  const destShelter = resolveDestinationShelter();
+  const dest: [number, number] = destShelter ? [destShelter.lat, destShelter.lng] : home;
+  const { data: routes, source: routeSource } = useRoutes(home, dest);
+
+  const scopeLabel = resolved?.city
+    ? `${resolved.city}${resolved.state ? `, ${resolved.state}` : ""}`
+    : household.locationName;
 
   return (
     <div className="space-y-6">
@@ -40,20 +55,37 @@ export function RespondPhase() {
         />
       </div>
 
+      <div className="dc-card flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-xs">
+        <span className="inline-flex items-center gap-1.5 font-medium text-card-foreground/75">
+          <MapPin className="h-3.5 w-3.5 text-[color:var(--severity-low)]" />
+          Plan scope: <span className="font-semibold text-foreground">{scopeLabel}</span>
+        </span>
+        <span className="text-card-foreground/55">
+          {source === "saved"
+            ? "Following your saved household"
+            : source === "device"
+              ? "Following your device location"
+              : "Demo scope — set your address to personalize"}
+        </span>
+      </div>
+
+      <RollupPanel />
+
       <div className="dc-card p-4">
         <DisasterPicker selected={disaster} onSelect={setDisaster} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5 lg:items-stretch">
         <div className="lg:col-span-3">
-          <ActionCard
-            ref={actionRef}
-            disaster={disaster}
-            volunteerApproved={volunteerApproved}
-          />
+          <ActionCard ref={actionRef} disaster={disaster} volunteerApproved={volunteerApproved} />
         </div>
         <div className="lg:col-span-2">
-          <MapPanel disaster={disaster} />
+          <MapPanel
+            disaster={disaster}
+            routes={routes}
+            selectedRouteId={selectedRouteId}
+            onSelectRoute={setSelectedRouteId}
+          />
         </div>
       </div>
 
@@ -82,7 +114,12 @@ export function RespondPhase() {
               </div>
               {scoresOpen && (
                 <div className="border-t border-border/60">
-                  <RouteScorePanel />
+                  <RouteScorePanel
+                    routes={routes}
+                    source={routeSource}
+                    selectedRouteId={selectedRouteId}
+                    onSelectRoute={setSelectedRouteId}
+                  />
                 </div>
               )}
               <p className="border-t border-border/60 px-5 py-2 text-[11px] italic text-card-foreground/60">
@@ -91,14 +128,13 @@ export function RespondPhase() {
             </div>
           )}
 
-          {mode === "community" && (
-            <CoordinatorPanel volunteerApproved={volunteerApproved} />
-          )}
+          {mode === "community" && <CoordinatorPanel volunteerApproved={volunteerApproved} />}
 
           <DisasterContrastPanel />
         </div>
 
         <div className="space-y-6">
+          <WeatherCard lat={household.lat} lng={household.lng} />
           <HouseholdCard />
           {disaster === "Flood" && (
             <div className="space-y-2">
@@ -124,9 +160,24 @@ export function RespondPhase() {
 
 function DisasterContrastPanel() {
   const cases = [
-    { Icon: Droplets, name: "Flood", verb: "GO to higher ground", tone: "text-[color:var(--severity-low)]" },
-    { Icon: Activity, name: "Earthquake", verb: "STAY — Drop, Cover, Hold On", tone: "text-[color:var(--foreground)]" },
-    { Icon: Sun, name: "Heat", verb: "GO to cooling center · WAIT if medically vulnerable, no car", tone: "text-[color:var(--severity-moderate)]" },
+    {
+      Icon: Droplets,
+      name: "Flood",
+      verb: "GO to higher ground",
+      tone: "text-[color:var(--severity-low)]",
+    },
+    {
+      Icon: Activity,
+      name: "Earthquake",
+      verb: "STAY — Drop, Cover, Hold On",
+      tone: "text-[color:var(--foreground)]",
+    },
+    {
+      Icon: Sun,
+      name: "Heat",
+      verb: "GO to cooling center · WAIT if medically vulnerable, no car",
+      tone: "text-[color:var(--severity-moderate)]",
+    },
   ];
   return (
     <div className="dc-card p-5">
