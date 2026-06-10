@@ -141,10 +141,13 @@ export function RespondQuickAction() {
         />
         <div className="min-w-0">
           <p className="text-base font-extrabold uppercase tracking-wide text-[color:var(--severity-critical)]">
-            Active Alert
+            {activeAlert ? activeAlert.event : alertState === "loading" ? "Checking current disaster" : "Current disaster"}
           </p>
           <p className="mt-1 text-sm font-medium text-foreground/85">
-            Follow the safe route and avoid marked danger areas.
+            {activeAlert?.headline ||
+              (hasRealLocation
+                ? `Route generated for ${currentDisaster.label.toLowerCase()} near your live location.`
+                : "Share your location to load the current disaster and route.")}
           </p>
         </div>
       </div>
@@ -178,30 +181,41 @@ export function RespondQuickAction() {
                     : geoError ?? "Location not shared"}
           </span>
         </div>
-        {!hasRealLocation && geoStatus !== "prompting" && (
+        {geoStatus !== "prompting" && (
           <button
             type="button"
             onClick={requestLocation}
             className="shrink-0 rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:opacity-90"
           >
-            Use my location
+            {hasRealLocation ? "Refresh" : "Use my location"}
           </button>
         )}
       </div>
 
       {/* Map */}
       <MapPanel
-        disaster="Flood"
+        disaster={currentDisaster.label}
         routes={routes}
         selectedRouteId={selectedRouteId}
         onSelectRoute={setSelectedRouteId}
         locationAware={hasRealLocation}
-        destinations={
-          hasRealLocation && destShelter
-            ? [{ id: destShelter.id, name: destShelter.name, lat: destShelter.lat, lng: destShelter.lng }]
-            : undefined
-        }
+        destinations={hasRealLocation ? evacuation.destinations : undefined}
       />
+
+      {hasRealLocation && (
+        <div className="rounded-xl border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm">
+          <p className="font-semibold">
+            {evacuation.isLoading
+              ? "Updating route…"
+              : routes.find((route) => route.id === selectedRouteId)?.name ?? "Route ready"}
+          </p>
+          <p className="mt-1 text-xs text-foreground/65">
+            {evacuation.source === "live"
+              ? "Using live road routing from your current GPS position."
+              : "Using estimated routing until live road routing responds."}
+          </p>
+        </div>
+      )}
 
       {/* Status confirmation */}
       {lastMessage && (
