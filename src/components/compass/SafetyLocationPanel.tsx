@@ -698,13 +698,6 @@ ${planBlocks}
                 </div>
               )}
             </div>
-
-            <button onClick={startDeviceFlow} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface">
-              <LocateFixed className="h-3.5 w-3.5" /> Use My Location
-            </button>
-            <button onClick={startManualFlow} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface">
-              <Pencil className="h-3.5 w-3.5" /> Enter Manually
-            </button>
           </div>
         </div>
       </div>
