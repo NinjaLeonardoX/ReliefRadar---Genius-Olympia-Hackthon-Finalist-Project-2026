@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useLocation } from "../LocationContext";
+import { usePhase } from "../PhaseContext";
 import { forwardGeocode, type GeocodeResult } from "@/lib/geocoding";
+import { HAZARD_RISKS, SEVERITY_META, type HazardRisk } from "@/data/prepare";
+
+const PrepareRiskMap = lazy(() => import("./PrepareRiskMap"));
 import {
   MapPin,
   LocateFixed,
@@ -583,7 +587,12 @@ export function SafetyLocationPanel() {
   const [wizardIndex, setWizardIndex] = useState(0); // 0..SECTIONS.length-1
 
   const [selectedDisaster, setSelectedDisaster] = useState<Disaster>("flood");
-  const [bodyTab, setBodyTab] = useState<"overview" | "people" | "routes" | "gaps">("overview");
+  const [bodyTab, setBodyTab] = useState<"overview" | "people" | "risk" | "routes" | "gaps">("overview");
+  const [riskHazardId, setRiskHazardId] = useState<string>("flood");
+  const [mapMounted, setMapMounted] = useState(false);
+  useEffect(() => setMapMounted(true), []);
+  const { activePhase } = usePhase();
+  const showRiskMap = activePhase === "prepare";
 
   const selected = locations.find((l) => l.id === selectedId) ?? SJFU;
   const currentRoute = useMemo(
@@ -897,6 +906,7 @@ ${planBlocks}
           const TABS: { id: typeof bodyTab; label: string }[] = [
             { id: "overview", label: "Overview" },
             { id: "people", label: copy.peopleTab },
+            ...(showRiskMap ? [{ id: "risk" as const, label: "Risk map" }] : []),
             { id: "routes", label: "Routes" },
             { id: "gaps", label: `Gaps${selected.gaps.length ? ` (${selected.gaps.length})` : ""}` },
           ];
@@ -988,6 +998,67 @@ ${planBlocks}
                     <p className="mt-3 text-[11px] italic text-card-foreground/55">
                       Re-run onboarding to update the {copy.groupNoun} profile.
                     </p>
+                  </div>
+                )}
+
+                {/* Risk map tab */}
+                {bodyTab === "risk" && showRiskMap && (
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/55">
+                      Risk map — orient first
+                    </p>
+                    <p className="mt-1 text-xs text-card-foreground/65">
+                      Tap a hazard zone on the map or pick one from the list to see the rehearsal route.
+                    </p>
+                    <div className="mt-3 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+                      <div className="overflow-hidden rounded-2xl">
+                        {mapMounted ? (
+                          <Suspense
+                            fallback={
+                              <div className="flex h-[380px] items-center justify-center rounded-2xl bg-surface text-sm text-foreground/60">
+                                Loading risk map…
+                              </div>
+                            }
+                          >
+                            <PrepareRiskMap selectedHazardId={riskHazardId} onSelectHazard={setRiskHazardId} />
+                          </Suspense>
+                        ) : (
+                          <div className="flex h-[380px] items-center justify-center rounded-2xl bg-surface text-sm text-foreground/60">
+                            Loading risk map…
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
+                          Hazards near you
+                        </p>
+                        {HAZARD_RISKS.map((h) => {
+                          const active = h.id === riskHazardId;
+                          const sev = SEVERITY_META[h.severity];
+                          return (
+                            <button
+                              key={h.id}
+                              type="button"
+                              onClick={() => setRiskHazardId(h.id)}
+                              className={[
+                                "flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left transition-colors",
+                                active
+                                  ? "border-foreground/70 bg-card-foreground/5 ring-1 ring-foreground/20"
+                                  : "border-border hover:border-slate-300",
+                              ].join(" ")}
+                            >
+                              <span className="text-sm font-semibold">{h.shortLabel}</span>
+                              <span className="flex items-center gap-2">
+                                <SeverityBars severity={h.severity} />
+                                <span className="w-16 text-right text-xs font-medium" style={{ color: sev.color }}>
+                                  {sev.label}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1527,5 +1598,20 @@ function GeneratedStep(p: SetupModalProps) {
         </button>
       </div>
     </>
+  );
+}
+
+function SeverityBars({ severity }: { severity: HazardRisk["severity"] }) {
+  const { bars, color } = SEVERITY_META[severity];
+  return (
+    <span className="flex items-center gap-0.5" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="h-3 w-1.5 rounded-[1px]"
+          style={{ background: i < bars ? color : "rgba(100,116,139,0.22)" }}
+        />
+      ))}
+    </span>
   );
 }
