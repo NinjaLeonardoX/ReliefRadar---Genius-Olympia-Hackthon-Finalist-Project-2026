@@ -251,7 +251,7 @@ function PrepareSnapshot() {
         <MiniRing value={s.ring} />
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">
-            {meta.label} · {meta.place}
+            {meta.label} · {place}
           </p>
           <p className="text-2xl font-bold leading-none text-white">{s.headline}</p>
         </div>
