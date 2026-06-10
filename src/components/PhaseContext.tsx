@@ -39,11 +39,6 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
 
   const setActivePhase = (p: Phase) => {
     setActivePhaseState(p);
-    try {
-      sessionStorage.setItem(PHASE_KEY, p);
-    } catch {
-      /* ignore */
-    }
   };
   const setMode = (m: Mode) => {
     setModeState(m);
@@ -54,8 +49,6 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Avoid passing hydrated through context — just use values.
-  void hydrated;
 
   return (
     <PhaseContext.Provider value={{ activePhase, setActivePhase, mode, setMode }}>
