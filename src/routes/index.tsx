@@ -2,9 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Compass,
   ShieldCheck,
-  MapPin,
-  Route as RouteIcon,
-  Users,
+  LifeBuoy,
   AlertTriangle,
   ArrowRight,
   Sparkles,
@@ -86,7 +84,7 @@ function LandingPage() {
                   href="#features"
                   className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10"
                 >
-                  See features
+                  How it works
                 </a>
               </div>
 
@@ -159,29 +157,59 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* FEATURES */}
+        {/* SYSTEMS */}
         <section id="features" className="mx-auto max-w-7xl px-6 pt-4 pb-12 lg:pt-6 lg:pb-16">
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-[0.25em] text-[#16A34A]">The system</p>
             <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-              One plan. Six panels. Zero guesswork.
+              One plan. Three systems. Zero guesswork.
             </h2>
             <p className="mt-4 text-lg text-white/60">
-              Every panel answers a question a panicked family is already asking. Nothing more.
+              Prepare before. Respond during. Recover after — one continuous flow that carries every
+              household from readiness to recovery.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((f) => (
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
+            {systems.map((s) => (
               <div
-                key={f.title}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-6 transition hover:border-white/20 hover:bg-white/[0.06]"
+                key={s.name}
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.01] p-8 transition duration-300 hover:-translate-y-1.5 hover:border-[#16A34A]/40 hover:shadow-[0_30px_60px_-25px_rgba(22,163,74,0.55)]"
               >
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[#16A34A]/15 ring-1 ring-[#16A34A]/30">
-                  <f.icon className="h-5 w-5 text-[#16A34A]" />
+                {/* Corner glow on hover */}
+                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#16A34A]/25 opacity-0 blur-3xl transition duration-500 group-hover:opacity-100" />
+                {/* Top sheen line */}
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#16A34A]/70 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
+
+                <div className="relative flex items-start justify-between">
+                  <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#16A34A]/15 ring-1 ring-[#16A34A]/30 transition duration-300 group-hover:scale-105 group-hover:bg-[#16A34A]/25">
+                    <s.icon className="h-7 w-7 text-[#5EE6A1]" />
+                  </span>
+                  <span className="text-6xl font-black leading-none text-white/[0.06] transition duration-300 group-hover:text-white/10">
+                    {s.step}
+                  </span>
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-white">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/60">{f.desc}</p>
+
+                <div className="relative mt-6">
+                  <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60">
+                    {s.when}
+                  </span>
+                  <h3 className="mt-3 text-2xl font-bold text-white">{s.name}</h3>
+                  <p className="text-sm font-medium text-[#5EE6A1]">{s.sub}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-white/60">{s.desc}</p>
+                </div>
+
+                <div className="relative mt-5 flex flex-wrap gap-2">
+                  {s.points.map((p) => (
+                    <span
+                      key={p}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1 text-xs text-white/75 ring-1 ring-white/10"
+                    >
+                      <CheckCircle2 className="h-3 w-3 text-[#16A34A]" />
+                      {p}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -224,35 +252,32 @@ function LandingPage() {
   );
 }
 
-const features = [
+const systems = [
   {
-    icon: Compass,
-    title: "Compass Plan",
-    desc: "One screen, one action. The most important thing to do, right now, in plain language.",
-  },
-  {
-    icon: MapPin,
-    title: "Safe Route Map",
-    desc: "Live flood, fire, and blocked-road layers. Color-coded routes you can trust at a glance.",
-  },
-  {
-    icon: RouteIcon,
-    title: "Route Scores",
-    desc: "Every path scored on safety, time, and elevation — with the math shown openly.",
-  },
-  {
-    icon: Users,
-    title: "Volunteer Match",
-    desc: "Neighbors with capacity matched to neighbors who need transport, medicine, or eyes-on.",
-  },
-  {
+    step: "01",
+    when: "Before",
     icon: ShieldCheck,
-    title: "Coordinator View",
-    desc: "A calm operations layer for block captains and emergency staff — shared, not siloed.",
+    name: "Prepare",
+    sub: "Readiness Radar",
+    desc: "Pre-solve risk, destination, route, and gaps so the plan is ready before the warning ever arrives.",
+    points: ["Household risk profile", "Community readiness", "Hazard awareness"],
   },
   {
-    icon: Sparkles,
-    title: "AI Disclosure",
-    desc: "Every signal source, model weight, and fallback shown inline. Trust by construction.",
+    step: "02",
+    when: "During",
+    icon: Compass,
+    name: "Respond",
+    sub: "Compass Action Plan",
+    desc: "One clear action — GO, STAY, or WAIT — with the safest route and a neighbor for those who can't leave alone.",
+    points: ["GO / STAY / WAIT", "Safe route map", "Volunteer match"],
+  },
+  {
+    step: "03",
+    when: "After",
+    icon: LifeBuoy,
+    name: "Recover",
+    sub: "Recovery Launchpad",
+    desc: "Guided steps for damage, assistance, cleanup, and wellbeing — clear and calm, never overwhelming.",
+    points: ["Recovery checklist", "Assistance steps", "Wellbeing"],
   },
 ];
