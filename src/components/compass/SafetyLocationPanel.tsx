@@ -12,6 +12,7 @@ import { RouteTrainingPanel } from "./RouteTrainingPanel";
 import {
   MapPin,
   LocateFixed,
+  Loader2,
   Pencil,
   Printer,
   CheckCircle2,
@@ -1540,8 +1541,15 @@ function NameStep(p: SetupModalProps) {
     <>
       {p.mode === "device" && (
         <div className="rounded-lg border border-border bg-surface/40 p-3 text-sm">
-          <p className="font-semibold text-black">Detected location</p>
-          <p className="text-xs text-black">{p.draftArea || "Detecting…"}</p>
+          <p className="flex items-center gap-2 font-semibold text-black">
+            {/Detecting|resolving|address lookup|permission denied|Couldn't detect/i.test(p.draftArea) ? (
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            ) : (
+              <LocateFixed className="h-4 w-4 text-[color:var(--severity-low)]" />
+            )}
+            Detected location
+          </p>
+          <p className="mt-1 text-xs text-black">{p.draftArea || "Detecting…"}</p>
         </div>
       )}
 
