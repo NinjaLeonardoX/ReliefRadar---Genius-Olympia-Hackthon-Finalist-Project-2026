@@ -705,16 +705,15 @@ export function SafetyLocationPanel() {
   const { confirmLocation, setManualLocation } = useLocation();
   const [locations, setLocations] = useState<SavedLocation[]>(() => {
     const stored = loadStoredLocations<SavedLocation>();
-    if (!stored || stored.length === 0) return [MY_ADDRESS, SJFU];
-    // Ensure the preloaded SJFU stays present even if older payloads dropped it.
-    const hasSjfu = stored.some((l) => l.id === SJFU.id);
-    const hasMyAddr = stored.some((l) => l.id === MY_ADDRESS.id);
+    if (!stored || stored.length === 0) return [...PRELOADED_LOCATIONS];
+    // Ensure all preloaded locations stay present even if older payloads dropped them.
     const merged = [...stored];
-    if (!hasMyAddr) merged.unshift(MY_ADDRESS);
-    if (!hasSjfu) merged.push(SJFU);
+    for (const preset of PRELOADED_LOCATIONS) {
+      if (!merged.some((l) => l.id === preset.id)) merged.push(preset);
+    }
     return merged;
   });
-  const [selectedId, setSelectedId] = useState<string>(MY_ADDRESS.id);
+  const [selectedId, setSelectedId] = useState<string>(MIT_LOC.id);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Persist every change so readiness percentage and answers survive reloads.
