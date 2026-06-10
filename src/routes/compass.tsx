@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LifecycleDashboard } from "../components/LifecycleDashboard";
 import { SafetyLocationPanel } from "../components/compass/SafetyLocationPanel";
 import { PreparePhase } from "../components/phases/PreparePhase";
-import { RespondPhase } from "../components/phases/RespondPhase";
+import { RespondQuickAction } from "../components/phases/RespondQuickAction";
 import { RecoverPhase } from "../components/phases/RecoverPhase";
 import { usePhase } from "../components/PhaseContext";
 import { useLocation } from "../components/LocationContext";
