@@ -17,7 +17,7 @@ const ATTRS = [
   { Icon: Accessibility, label: "Accessibility needs" },
 ];
 
-export function HouseholdCard({ onGeneratePlan }: Props) {
+export function HouseholdCard({ onGeneratePlan, riskMap }: Props) {
   const { household, activeAddress, resolved, source } = useLocation();
 
   const title = activeAddress?.name ?? "Your household";
