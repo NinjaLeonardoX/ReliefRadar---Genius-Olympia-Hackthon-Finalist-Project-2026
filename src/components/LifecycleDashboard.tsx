@@ -66,7 +66,7 @@ export function LifecycleDashboard() {
               "Confirm check-in contact",
             ]}
             active={activePhase === "prepare"}
-            onSelect={() => setActivePhase("prepare")}
+            onSelect={() => goPhase("prepare")}
             visualClass="bg-[radial-gradient(circle_at_25%_20%,rgba(125,211,252,0.85),transparent_60%),radial-gradient(circle_at_85%_85%,rgba(14,116,144,0.9),transparent_55%),linear-gradient(135deg,#0c4a6e_0%,#0369a1_55%,#082f49_100%)]"
             riskTexture
             snapshot={<PrepareSnapshot />}
@@ -91,7 +91,7 @@ export function LifecycleDashboard() {
               "Approve Ana as volunteer driver",
             ]}
             active={activePhase === "respond"}
-            onSelect={() => setActivePhase("respond")}
+            onSelect={() => goPhase("respond")}
             visualClass="bg-[radial-gradient(circle_at_80%_20%,rgba(248,113,113,0.85),transparent_55%),radial-gradient(circle_at_20%_85%,rgba(251,191,36,0.7),transparent_55%),linear-gradient(135deg,#7f1d1d_0%,#b91c1c_55%,#451a03_100%)]"
             snapshot={<RespondSnapshot />}
           />
@@ -116,7 +116,7 @@ export function LifecycleDashboard() {
               "Complete wellbeing check",
             ]}
             active={activePhase === "recover"}
-            onSelect={() => setActivePhase("recover")}
+            onSelect={() => goPhase("recover")}
             visualClass="bg-[radial-gradient(circle_at_25%_30%,rgba(134,239,172,0.85),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(34,197,94,0.85),transparent_55%),linear-gradient(135deg,#14532d_0%,#166534_55%,#052e16_100%)]"
             snapshot={<RecoverSnapshot />}
           />
