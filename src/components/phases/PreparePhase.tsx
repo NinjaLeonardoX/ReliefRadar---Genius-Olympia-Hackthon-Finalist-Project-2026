@@ -301,7 +301,7 @@ export function PreparePhase() {
 
         {scope === "state" && (
           <RollupStatsPanel
-            title="Colorado · statewide"
+            title={`${stateLabel} · statewide`}
             Icon={Landmark}
             ringLabel="State readiness"
             data={STATE_READINESS}
