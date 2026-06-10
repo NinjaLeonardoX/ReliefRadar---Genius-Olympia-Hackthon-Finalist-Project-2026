@@ -181,7 +181,7 @@ export function RecoverPhase() {
     ? `${resolved.city}${resolved.state ? `, ${resolved.state}` : ""}`
     : household.locationName;
 
-  const openCount = needs.filter((n) => n.status === "Open").length;
+  const openCount = needs.filter((n) => n.status === "Posted").length;
   const matchedCount = needs.filter((n) => n.status === "Matched" || n.status === "In Progress").length;
   const completedCount = needs.filter((n) => n.status === "Completed").length;
 
