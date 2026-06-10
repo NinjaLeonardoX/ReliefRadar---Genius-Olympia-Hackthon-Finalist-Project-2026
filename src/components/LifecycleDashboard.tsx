@@ -157,12 +157,12 @@ function ScopeSelector() {
               "rounded-lg px-3 py-1.5 text-left transition-colors",
               active
                 ? "bg-[color:var(--foreground)] text-white shadow-sm"
-                : "text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]",
+                : "text-card-foreground hover:bg-card-foreground/5",
             ].join(" ")}
           >
             <span className="block text-sm font-semibold leading-tight">{s.label}</span>
             <span
-              className={`block text-[10px] leading-tight ${active ? "text-white/75" : "text-card-foreground/50"}`}
+              className={`block text-[10px] font-medium leading-tight ${active ? "text-white/85" : "text-card-foreground/75"}`}
             >
               {placeFor(s.id)}
             </span>

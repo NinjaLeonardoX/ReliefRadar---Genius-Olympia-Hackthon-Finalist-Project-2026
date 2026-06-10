@@ -32,7 +32,7 @@ import {
 import { decideAction } from "@/lib/actions";
 import { getBestRoute, scoreRoute } from "@/lib/scoring";
 import { ROUTES } from "@/data/seed";
-import { useHousehold } from "../LocationContext";
+import { useHousehold, useLocation } from "../LocationContext";
 import { RollupPanel } from "../RollupPanel";
 
 // Prepare leads with the calm risk map. Leaflet touches `window`, so the map is
@@ -43,7 +43,22 @@ export function PreparePhase() {
   // One lens — the rollup selector (rendered in the page content) zooms the
   // readiness view from your household out to community, town, state, national.
   const { scope } = usePhase();
+  const { activeAddress, resolved } = useLocation();
+  const householdLabel = activeAddress?.name ?? "Your household";
+  const townLabel = resolved?.city ?? resolved?.county ?? "your town";
+  const stateLabel = resolved?.state ?? resolved?.stateCode ?? "your state";
+  const nationLabel = resolved?.country ?? "your country";
   const scopeMeta = getScopeMeta(scope);
+  const scopePlaceLabel =
+    scope === "household"
+      ? householdLabel
+      : scope === "community"
+        ? (resolved?.city ? `near ${resolved.city}` : "your area")
+        : scope === "town"
+          ? townLabel
+          : scope === "state"
+            ? stateLabel
+            : nationLabel;
   const [selectedId, setSelectedId] = useState<string>("flood");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -116,7 +131,7 @@ export function PreparePhase() {
           {/* Tappable hazard list with severity strip */}
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
-              Hazards near North Creek
+              Hazards near {townLabel}
             </p>
             {HAZARD_RISKS.map((h) => {
               const active = h.id === selectedId;
@@ -161,7 +176,7 @@ export function PreparePhase() {
           </h3>
           <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
             Readiness for{" "}
-            <span className="font-semibold text-card-foreground">{scopeMeta.place}</span> —{" "}
+            <span className="font-semibold text-card-foreground">{scopePlaceLabel}</span> —{" "}
             {scopeMeta.blurb}
           </p>
         </div>
@@ -173,7 +188,7 @@ export function PreparePhase() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-bold tracking-tight">
-                      Readiness gaps for Rivera Family
+                      Readiness gaps for {householdLabel}
                     </h3>
                     <p className="mt-1 text-sm text-card-foreground/70">
                       Close gaps before the warning. Each fix raises the score live.
@@ -249,7 +264,7 @@ export function PreparePhase() {
 
                 {readiness === 100 && (
                   <div className="mt-5 rounded-xl bg-[color:var(--severity-low)]/10 p-4 text-sm font-medium text-[color:var(--severity-low)] ring-1 ring-[color:var(--severity-low)]/30">
-                    Rivera Family is rehearsed. Transport pre-matched, shelter confirmed. The siren
+                    {householdLabel} is rehearsed. Transport pre-matched, shelter confirmed. The siren
                     no longer starts the plan — it executes it.
                   </div>
                 )}
@@ -266,7 +281,7 @@ export function PreparePhase() {
                   Preparedness is rehearsal that solves the evacuation before the siren.
                 </p>
                 <p className="mt-3 text-xs text-card-foreground/65">
-                  Rivera Family should be pre-matched with transport before flood risk increases.
+                  {householdLabel} should be pre-matched with transport before flood risk increases.
                 </p>
               </div>
             </div>
@@ -277,7 +292,7 @@ export function PreparePhase() {
 
         {scope === "town" && (
           <RollupStatsPanel
-            title="North Creek · town-wide"
+            title={`${townLabel} · town-wide`}
             Icon={Building2}
             ringLabel="Town readiness"
             data={TOWN_READINESS}
@@ -286,7 +301,7 @@ export function PreparePhase() {
 
         {scope === "state" && (
           <RollupStatsPanel
-            title="Colorado · statewide"
+            title={`${stateLabel} · statewide`}
             Icon={Landmark}
             ringLabel="State readiness"
             data={STATE_READINESS}
@@ -296,7 +311,7 @@ export function PreparePhase() {
 
         {scope === "national" && (
           <RollupStatsPanel
-            title="United States · national"
+            title={`${nationLabel} · national`}
             Icon={Globe}
             ringLabel="National readiness"
             data={NATIONAL_READINESS}
@@ -320,6 +335,8 @@ function ReadinessBar({ value }: { value: number }) {
 }
 
 function CommunityReadinessPanel() {
+  const { resolved } = useLocation();
+  const townLabel = resolved?.city ?? resolved?.county ?? "your area";
   const ready = COMMUNITY_MEMBERS.filter((m) => m.readiness >= 80).length;
   const avg = Math.round(
     COMMUNITY_MEMBERS.reduce((sum, m) => sum + m.readiness, 0) / COMMUNITY_MEMBERS.length,
@@ -330,7 +347,7 @@ function CommunityReadinessPanel() {
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-[color:var(--severity-low)]" aria-hidden="true" />
           <h3 className="text-sm font-bold uppercase tracking-wider">
-            North Creek block · 5 households
+            {townLabel} block · {COMMUNITY_MEMBERS.length} households (illustrative)
           </h3>
         </div>
         <ul className="mt-4 space-y-3">
