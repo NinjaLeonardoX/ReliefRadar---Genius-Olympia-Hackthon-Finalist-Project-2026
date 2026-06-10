@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle, ShieldCheck, Siren, MapPin, Loader2, Check } from "lucide-react";
 import { MapPanel } from "../compass/MapPanel";
 import { WeatherCard } from "../WeatherCard";
 import { useLocation } from "../LocationContext";
-import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
-import { SHELTERS } from "@/data/seed";
-import type { Shelter } from "@/types";
+import { useEvacuationRoutes } from "@/lib/queries/evacuation";
 import { readSOSRecipient, formatSOSMessage } from "@/routes/iq";
+
 
 // Haversine distance in km between two [lat, lng] points.
 function distanceKm(a: [number, number], b: [number, number]): number {

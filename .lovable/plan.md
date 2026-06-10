@@ -1,49 +1,35 @@
-## Goal
+## Problem
 
-On `/compass/prepare`, the readiness questionnaire (Saved Safety Location → "Start readiness onboarding") should:
-1. **Persist** the percentage and answers across reloads.
-2. Be **editable after onboarding** without re-running the wizard.
-3. Use a richer **3-category** structure per hazard instead of only "Do you know…" questions.
+On `/compass/respond`, no evacuation line is drawn from the user's real location. Two bugs in `src/components/phases/RespondQuickAction.tsx` cause this:
 
-## Question structure (per hazard section)
+1. It calls `useRoutes(home, routingDest)` from `src/lib/queries/routing.ts`. With the ORS flag off (the default — `VITE_LIVE_ROUTING` isn't set), `useRoutes` returns the **seed `ROUTES`** unchanged. Those polylines are hard-coded around the North Creek demo scenario, not around the user, so they would render in the wrong place.
+2. To hide that, the component sets `mapRoutes = []` whenever the live user is >150 km from the nearest seed shelter (`SHELTERS`, mostly Boulder/North Creek). For any user not sitting on the demo coordinates, this branch hits and **no route line is drawn at all** — exactly what the user is seeing.
 
-Each of the 6 hazard sections becomes 3 categories × 8 questions total (3 + 3 + 2):
+The Prepare flow already solves this with `useEvacuationRoutes` (`src/lib/queries/evacuation.ts`): it synthesizes safe destinations around the real origin, routes via ORS when a key is present, and falls back to honest straight-line geometry otherwise — so a line always renders.
 
-- **Do you know** (3): the existing route/destination/avoid-type knowledge questions, trimmed to the top 3.
-- **Physical & Equipment** (3): tangible items — go-bag, flashlight/lantern, water, food, batteries, generator, masks, blankets, etc. Tailored per hazard.
-- **Mental Preparedness** (2): household-practiced drill, calm-under-pressure plan, family communication / who-checks-on-whom.
+## Fix
 
-Examples for **Flood**:
-- *Know*: nearest higher-ground location · which roads/bridges to avoid · backup plan if route is blocked.
-- *Equip*: go-bag ready · waterproof flashlight + batteries · 3 days of water/food.
-- *Mental*: practiced the route with everyone · agreed family meet-up point if separated.
+Make Respond use the same location-aware engine instead of the seed-bound `useRoutes`.
 
-The "Base Profile" section stays as-is (it's people demographics, not preparedness).
+In `src/components/phases/RespondQuickAction.tsx`:
 
-## Persistence
+- Replace the `useRoutes` / `nearestShelter` / `destReachable` / `routingDest` block with:
+  - `const { routes, destinations, source: routeSource } = useEvacuationRoutes(home, "flood", true);`
+- Pass `routes` directly to `<MapPanel routes={routes} ... />` (drop the `mapRoutes = []` gating).
+- Build the `destinations` prop for the map from the engine's `destinations` (id/name/lat/lng) instead of `destShelter`.
+- Remove the "No seed shelter within range" empty-state message; it no longer applies.
+- Remove now-unused imports (`useRoutes`, `resolveDestinationShelter`, `SHELTERS`, `Shelter`, `useMemo`, `distanceKm`).
 
-- Add a new module `src/lib/preparedLocations.ts` with `loadLocations()` / `saveLocations()` reading/writing `localStorage` key `dc:savedLocations:v2`. Schema versioned to invalidate old data.
-- `SafetyLocationPanel` hydrates state from `loadLocations()` on mount (falls back to `[MY_ADDRESS, SJFU]`), and writes back on every `setLocations` change via `useEffect`.
-- Preloaded SJFU is always present even after persistence (merge if missing).
+Behavior after the change:
+- Live location → engine generates higher-ground / inland destinations near the user and returns a `RouteOption[]` with real geometry (ORS) or straight-line fallback. A line renders every time.
+- No live location yet (seed Rivera household) → same engine still produces routes around the seed origin, so the demo keeps working.
+- Earthquake disaster would suppress routes (shelter-in-place), but Respond is hard-coded to `"Flood"`, so routes always render here.
 
-## Edit-after-onboarding
+## Out of scope
 
-Two complementary affordances on the results panel (`selected.ready === true`):
+- No changes to scoring, the map component, or the routing server function.
+- No new env vars; ORS stays optional. Without `ORS_API_KEY`, the fallback straight-line is intentional and already labeled in the engine's `source: "estimated"`.
 
-**A. Inline toggles on the Gaps tab.** Each open gap row gets a small `Mark done` button that flips the underlying answer to `"yes"` and re-runs `computeScores`. Closed gaps disappear from the list and the percentage rises live.
+## Files to edit
 
-**B. New "Answers" tab.** Shows every section collapsed; expanding a section reveals each question with Yes / No / Skip-section controls. Editing an answer recomputes scores and persists.
-
-Both paths call a shared helper `updateAnswer(locationId, sectionId, questionKey, value)` that:
-- Mutates `locations[i].answers`,
-- Recomputes `readinessScore`, `hazardScores`, `gaps` with the existing `computeScores`,
-- Persists via the new module.
-
-## Technical notes
-
-- File touched: `src/components/compass/SafetyLocationPanel.tsx` (questions array, persistence, new tab, edit helper, gaps-tab toggle).
-- New file: `src/lib/preparedLocations.ts` (Zod-validated load/save).
-- Add `category: "know" | "equip" | "mental"` to the `Question` type. `computeScores` is category-agnostic so scoring math stays unchanged.
-- Wizard screen renders each hazard step as three labeled sub-cards (Know / Equip / Mental) to match the new structure, still with the Yes-to-all / No-to-all / Skip controls already present.
-- Re-run onboarding button stays as an alternative to the new edit flows.
-- No backend changes — purely client-side localStorage so it persists per browser, matching the existing "device-only" model used elsewhere in the app.
+- `src/components/phases/RespondQuickAction.tsx`
