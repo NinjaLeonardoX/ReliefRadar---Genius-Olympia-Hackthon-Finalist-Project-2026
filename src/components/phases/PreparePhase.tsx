@@ -131,7 +131,7 @@ export function PreparePhase() {
           {/* Tappable hazard list with severity strip */}
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
-              Hazards near North Creek
+              Hazards near {townLabel}
             </p>
             {HAZARD_RISKS.map((h) => {
               const active = h.id === selectedId;
