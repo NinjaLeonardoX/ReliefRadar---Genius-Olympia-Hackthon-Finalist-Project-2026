@@ -19,6 +19,11 @@ interface Props {
   locationAware?: boolean;
 }
 
+// Tick a "last updated" counter that resets every few seconds (simulating a
+// poll) so the map header reads as a live feed that keeps refreshing rather
+// than a frozen screenshot.
+const REFRESH_SECONDS = 4;
+
 export function MapPanel({
   disaster,
   routes,
@@ -29,6 +34,16 @@ export function MapPanel({
 }: Props) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  const [secsAgo, setSecsAgo] = useState(0);
+  useEffect(() => {
+    const id = setInterval(
+      () => setSecsAgo((s) => (s + 1) % (REFRESH_SECONDS + 1)),
+      1000,
+    );
+    return () => clearInterval(id);
+  }, []);
+  const justRefreshed = secsAgo === 0;
 
   const loading = (
     <div className="flex h-80 items-center justify-center text-sm text-card-foreground/60">
@@ -45,6 +60,13 @@ export function MapPanel({
         <div className="flex items-center gap-2">
           <MapIcon className="h-4 w-4 text-[color:var(--severity-low)]" aria-hidden="true" />
           <h3 className="text-sm font-semibold">Neighborhood map</h3>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--severity-low)]/12 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[color:var(--severity-low)]">
+            <span className="dc-live-dot h-1.5 w-1.5 rounded-full bg-[color:var(--severity-low)]" aria-hidden="true" />
+            Live
+          </span>
+          <span className="text-[10px] font-medium tabular-nums text-card-foreground/55">
+            {justRefreshed ? "Re-checking routes…" : `Updated ${secsAgo}s ago`}
+          </span>
         </div>
         <ul className="flex flex-wrap items-center gap-3 text-[11px] font-medium text-card-foreground/70">
           <li className="inline-flex items-center gap-1.5">
@@ -88,6 +110,7 @@ export function MapPanel({
             zoom={locationAware ? 12 : undefined}
             showDemoLayers={!locationAware}
             destinations={locationAware ? destinations : undefined}
+            enableDriveSim
           />
         </Suspense>
       ) : (
