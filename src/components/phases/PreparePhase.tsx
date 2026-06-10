@@ -215,68 +215,7 @@ export function PreparePhase() {
         </p>
       </div>
 
-      {/* === 1. RISK RADAR === */}
-      <section className="space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-lg font-bold tracking-tight">Standing risk for your area</h3>
-          <p className="text-[11px] text-card-foreground/55">
-            Standing risk — FEMA National Risk Index (demo data).
-            <DefensibilityPopover
-              label="Why this?"
-              sources={[
-                "FEMA National Risk Index (county-level annualized loss)",
-                "FEMA flood-hazard maps (zone overlay)",
-                "USGS Quaternary faults (proximity)",
-              ]}
-              rule="Severity = NRI annualized-loss percentile blended with hazard-specific overlays. Tie-break highest first."
-              note="Risk shown is standing exposure, not a forecast."
-            />
-          </p>
-        </div>
-
-        <div className="dc-card divide-y divide-border/60 overflow-hidden p-0">
-          {HAZARDS.map(({ id, label, severity, Icon, source }) => {
-            const active = selected === id;
-            const s = SEVERITY_STYLES[severity];
-            const flagged = severity === "High" && hazardsWithOpenGaps.has(id);
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setSelected(id)}
-                aria-pressed={active}
-                className={[
-                  "flex w-full items-center gap-4 px-4 py-3 text-left transition-colors",
-                  active ? "bg-[color:var(--foreground)]/[0.04]" : "hover:bg-card-foreground/[0.03]",
-                ].join(" ")}
-              >
-                <span className={["flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1", s.chip].join(" ")}>
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold">{label}</p>
-                    {flagged && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--severity-critical)]/12 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[color:var(--severity-critical)] ring-1 ring-[color:var(--severity-critical)]/30">
-                        <ShieldAlert className="h-3 w-3" /> High risk · gaps open
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-card-foreground/8">
-                    <div className={["h-full rounded-full transition-all", s.bar].join(" ")} style={{ width: `${s.pct}%` }} />
-                  </div>
-                  <p className="mt-1 text-[10px] text-card-foreground/55">{source}</p>
-                </div>
-                <span className={["inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ring-1", s.chip].join(" ")}>
-                  {severity}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* === 2. ROUTE READINESS === */}
+      {/* === 1. ROUTE READINESS (map first) === */}
       <section className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -345,6 +284,67 @@ export function PreparePhase() {
               You already know where you go — for all five.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* === 2. RISK RADAR === */}
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className="text-lg font-bold tracking-tight">Standing risk for your area</h3>
+          <p className="text-[11px] text-card-foreground/55">
+            Standing risk — FEMA National Risk Index (demo data).
+            <DefensibilityPopover
+              label="Why this?"
+              sources={[
+                "FEMA National Risk Index (county-level annualized loss)",
+                "FEMA flood-hazard maps (zone overlay)",
+                "USGS Quaternary faults (proximity)",
+              ]}
+              rule="Severity = NRI annualized-loss percentile blended with hazard-specific overlays. Tie-break highest first."
+              note="Risk shown is standing exposure, not a forecast."
+            />
+          </p>
+        </div>
+
+        <div className="dc-card divide-y divide-border/60 overflow-hidden p-0">
+          {HAZARDS.map(({ id, label, severity, Icon, source }) => {
+            const active = selected === id;
+            const s = SEVERITY_STYLES[severity];
+            const flagged = severity === "High" && hazardsWithOpenGaps.has(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setSelected(id)}
+                aria-pressed={active}
+                className={[
+                  "flex w-full items-center gap-4 px-4 py-3 text-left transition-colors",
+                  active ? "bg-[color:var(--foreground)]/[0.04]" : "hover:bg-card-foreground/[0.03]",
+                ].join(" ")}
+              >
+                <span className={["flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1", s.chip].join(" ")}>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold">{label}</p>
+                    {flagged && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--severity-critical)]/12 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[color:var(--severity-critical)] ring-1 ring-[color:var(--severity-critical)]/30">
+                        <ShieldAlert className="h-3 w-3" /> High risk · gaps open
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-card-foreground/8">
+                    <div className={["h-full rounded-full transition-all", s.bar].join(" ")} style={{ width: `${s.pct}%` }} />
+                  </div>
+                  <p className="mt-1 text-[10px] text-card-foreground/55">{source}</p>
+                </div>
+                <span className={["inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ring-1", s.chip].join(" ")}>
+                  {severity}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
