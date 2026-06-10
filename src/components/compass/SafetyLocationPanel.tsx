@@ -1311,16 +1311,24 @@ function WizardStep(p: SetupModalProps) {
   const isLast = p.wizardIndex === SECTIONS.length - 1;
   const canBack = p.wizardIndex > 0;
 
+  const typeCopy = getTypeCopy(p.draftType);
+  const isBase = section.id === "base";
+  const heading = isBase ? typeCopy.baseTitle : section.title;
+  const description = isBase ? typeCopy.baseIntro : null;
+
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-base font-bold text-foreground">{section.title}</h3>
+        <h3 className="text-base font-bold text-foreground">{heading}</h3>
         {isSkipped && (
           <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--severity-moderate)]/15 px-2 py-0.5 text-[11px] font-semibold text-[color:var(--severity-moderate)]">
             <AlertTriangle className="h-3 w-3" /> Not assessed · review before printing final guide
           </span>
         )}
       </div>
+      {description && (
+        <p className="text-sm text-card-foreground/75">{description}</p>
+      )}
 
       <div className="flex flex-wrap gap-1.5">
         <button onClick={yesAll} className="inline-flex items-center gap-1 rounded-full bg-[color:var(--severity-low)]/15 px-3 py-1 text-[11px] font-semibold text-[color:var(--severity-low)] hover:brightness-110">
