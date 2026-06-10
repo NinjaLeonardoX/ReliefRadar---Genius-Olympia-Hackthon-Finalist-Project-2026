@@ -98,7 +98,7 @@ const SEED_NEEDS: Need[] = [
     where: "Near Maple Street",
     urgency: "Urgent",
     vulnerable: "Family with infant",
-    status: "Open",
+    status: "Posted",
   },
   {
     id: "n2",
@@ -114,7 +114,7 @@ const SEED_NEEDS: Need[] = [
     what: "Hot meal for 4",
     where: "Pine Road",
     urgency: "Soon",
-    status: "Open",
+    status: "Posted",
   },
 ];
 
@@ -264,7 +264,7 @@ export function RecoverPhase() {
           detectedLocation={scopeLabel}
           onClose={() => setOpenForm(null)}
           onSubmit={(n) => {
-            setNeeds((prev) => [{ ...n, id: `n${Date.now()}`, status: "Open" }, ...prev]);
+            setNeeds((prev) => [{ ...n, id: `n${Date.now()}`, status: "Posted" }, ...prev]);
             setOpenForm(null);
           }}
         />
