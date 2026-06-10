@@ -59,11 +59,21 @@ type SectionId = "base" | Disaster;
 
 type Answer = "yes" | "no" | null;
 
+export type QuestionCategory = "know" | "equip" | "mental";
+
+export const CATEGORY_META: Record<QuestionCategory, { label: string; blurb: string }> = {
+  know: { label: "Do you know", blurb: "Knowledge of routes, destinations, and avoid zones." },
+  equip: { label: "Physical & Equipment", blurb: "Gear, supplies, and items packed and ready." },
+  mental: { label: "Mental Preparedness", blurb: "Practice, calm, and family communication." },
+};
+
 interface Question {
   key: string;
   q: string;
   /** Optional human-readable gap label when answered "no". */
   gap?: string;
+  /** Which sub-category this question belongs to (hazard sections only). */
+  category?: QuestionCategory;
 }
 
 interface Section {
