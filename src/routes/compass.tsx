@@ -46,7 +46,7 @@ function CompassLayout() {
         {/* Safety Location sits at the top — except during Respond, which is the simplest screen */}
         {!isRespond && <SafetyLocationPanel />}
 
-        {hasLocation ? (
+        {hasLocation || isRespond ? (
           <>
             {!isRespond && <LifecycleDashboard />}
 
