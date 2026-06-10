@@ -4,6 +4,7 @@ import { usePhase } from "../PhaseContext";
 import { forwardGeocode, inferLocationType, type GeocodeResult, type PlaceSuggestion } from "@/lib/geocoding";
 import { HAZARD_RISKS, SEVERITY_META, type HazardRisk } from "@/data/prepare";
 import { generateCompassPlan } from "@/lib/compass-plan.functions";
+import { lookupPlaceDetails } from "@/lib/place-lookup.functions";
 import { PlaceAutocomplete } from "./PlaceAutocomplete";
 
 const PrepareRiskMap = lazy(() => import("./PrepareRiskMap"));
