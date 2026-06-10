@@ -242,6 +242,7 @@ export function RecoverPhase() {
       {/* Forms */}
       {openForm === "need" && (
         <NeedForm
+          detectedLocation={scopeLabel}
           onClose={() => setOpenForm(null)}
           onSubmit={(n) => {
             setNeeds((prev) => [{ ...n, id: `n${Date.now()}`, status: "Open" }, ...prev]);
@@ -251,6 +252,7 @@ export function RecoverPhase() {
       )}
       {openForm === "help" && (
         <HelpForm
+          detectedLocation={scopeLabel}
           onClose={() => setOpenForm(null)}
           onSubmit={(h) => {
             setHelpers((prev) => [{ ...h, id: `h${Date.now()}` }, ...prev]);
@@ -258,6 +260,7 @@ export function RecoverPhase() {
           }}
         />
       )}
+
 
       {/* Compass visual */}
       <div id="compass" className="dc-card dc-elev-hero p-6">
