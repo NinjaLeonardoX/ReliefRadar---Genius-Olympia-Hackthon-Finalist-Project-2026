@@ -130,6 +130,59 @@ export const WUI_EDGE: [number, number][] = [
 /** Post-shaking assembly area, sited off the fault line. */
 export const ASSEMBLY_POINT = { name: "Lincoln Park", lat: 40.0325, lng: -105.2655 };
 
+/**
+ * Pre-mapped route per hazard, expressed as deltas from the household origin
+ * (lat, lng). The route is drawn home → … → destination on the Prepare risk
+ * map when that hazard is selected. Works for any address because we add the
+ * deltas to the live household coordinates.
+ */
+export interface HazardRoute {
+  offsets: [number, number][];
+  destinationName: string;
+  destinationKind: string;
+  color: string;
+  note: string;
+}
+
+export const HAZARD_ROUTES: Record<string, HazardRoute> = {
+  flood: {
+    offsets: [[0, 0], [0.0025, 0.0025], [0.0055, 0.0065], [0.0085, 0.0115], [0.0095, 0.0135]],
+    destinationName: "Higher-ground shelter",
+    destinationKind: "Hilltop Community Center",
+    color: "#0EA5E9",
+    note: "Avoids low-lying roads · uphill route",
+  },
+  heat: {
+    offsets: [[0, 0], [-0.0015, 0.0035], [-0.0028, 0.0072]],
+    destinationName: "Cooling center",
+    destinationKind: "Public library / community center",
+    color: "#F59E0B",
+    note: "Short shaded route · travel in cooler hours",
+  },
+  hurricane: {
+    offsets: [[0, 0], [0.0035, -0.0055], [0.0075, -0.0125], [0.0125, -0.021], [0.016, -0.027]],
+    destinationName: "Inland evacuation shelter",
+    destinationKind: "Outside the storm zone",
+    color: "#7C3AED",
+    note: "Inland · leave before the deadline",
+  },
+  wildfire: {
+    offsets: [[0, 0], [-0.0035, 0.0035], [-0.007, 0.0085], [-0.0095, 0.013]],
+    destinationName: "Evacuation shelter",
+    destinationKind: "Away from the fire path",
+    color: "#EA580C",
+    note: "Fastest safe exit · backup route ready",
+  },
+  earthquake: {
+    offsets: [[0, 0], [0.0012, 0.0028], [0.003, 0.005]],
+    destinationName: "Lincoln Park",
+    destinationKind: "Open assembly area off the fault line",
+    color: "#0F766E",
+    note: "Post-shaking only · if your building is unsafe",
+  },
+};
+
+
 // ---- Readiness gaps (household profile → fixable prep items) ----
 
 export type GapFix = "volunteer" | "mark";
