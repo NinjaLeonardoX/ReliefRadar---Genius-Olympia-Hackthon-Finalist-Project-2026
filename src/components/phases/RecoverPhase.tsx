@@ -246,6 +246,12 @@ export function RecoverPhase() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className="flex items-center gap-2 rounded-xl border border-[color:var(--severity-moderate)]/40 bg-[color:var(--severity-moderate)]/10 px-4 py-2.5 text-sm font-semibold text-foreground">
+          <Radio className={`h-4 w-4 text-[color:var(--severity-moderate)] ${sending ? "animate-pulse" : ""}`} />
+          {toast}
+        </div>
+      )}
       {/* Header */}
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--severity-low)]">
