@@ -652,7 +652,7 @@ export function SafetyLocationPanel() {
   const [genStatus, setGenStatus] = useState<string>("");
 
   const [selectedDisaster, setSelectedDisaster] = useState<Disaster>("flood");
-  const [bodyTab, setBodyTab] = useState<"overview" | "people" | "risk" | "routes" | "gaps">("overview");
+  const [bodyTab, setBodyTab] = useState<"overview" | "people" | "risk" | "routes" | "gaps" | "answers">("overview");
   const [riskHazardId, setRiskHazardId] = useState<string>("flood");
   const [mapMounted, setMapMounted] = useState(false);
   useEffect(() => setMapMounted(true), []);
