@@ -5,8 +5,6 @@ import {
   Radar,
   Users,
   MapPin,
-  Navigation,
-  ShieldAlert,
   Building2,
   Landmark,
   Globe,
@@ -24,16 +22,12 @@ import {
   TOWN_READINESS,
   STATE_READINESS,
   NATIONAL_READINESS,
-  getHazard,
   getScopeMeta,
   readinessColor,
   type HazardRisk,
   type RollupData,
 } from "@/data/prepare";
-import { decideAction } from "@/lib/actions";
-import { getBestRoute, scoreRoute } from "@/lib/scoring";
-import { ROUTES } from "@/data/seed";
-import { useHousehold, useLocation } from "../LocationContext";
+import { useLocation } from "../LocationContext";
 import { RollupPanel } from "../RollupPanel";
 
 // Prepare leads with the calm risk map. Leaflet touches `window`, so the map is
@@ -71,8 +65,6 @@ export function PreparePhase() {
   const [rideMatchOpen, setRideMatchOpen] = useState(false);
 
   const readiness = useMemo(() => Math.round((closed.size / PREPARE_GAPS.length) * 100), [closed]);
-
-  const selectedHazard = getHazard(selectedId);
 
   function closeGap(id: string) {
     setClosed((s) => new Set(s).add(id));
@@ -167,10 +159,7 @@ export function PreparePhase() {
 
       <RollupPanel />
 
-      {/* 2 · ROUTE READINESS */}
-      <RouteReadinessPanel hazard={selectedHazard} />
-
-      {/* 3 · READINESS — rolls up from household to national */}
+      {/* 2 · READINESS — rolls up from household to national */}
       <section className="space-y-4">
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-card-foreground">
@@ -468,88 +457,6 @@ function SeverityBars({ severity }: { severity: HazardRisk["severity"] }) {
         />
       ))}
     </span>
-  );
-}
-
-/**
- * Route readiness for the selected hazard. Uses the same decision + scoring
- * engine as Respond — flood pulls the best route and its live score — but
- * renders BELOW the map with no active route drawn on the calm map itself.
- */
-function RouteReadinessPanel({ hazard }: { hazard: HazardRisk }) {
-  const household = useHousehold();
-  const decision = decideAction(hazard.disasterType, household);
-
-  // Flood enriches the seeded route line with the live engine score.
-  let routeLine = hazard.routeLine;
-  if (hazard.id === "flood") {
-    const best = getBestRoute(ROUTES);
-    if (best) {
-      const { score } = scoreRoute(best);
-      routeLine = `${hazard.routeLine} · score ${score} · ${best.distanceMiles.toFixed(1)} mi`;
-    }
-  }
-
-  const Icon = hazard.postShaking ? ShieldAlert : Navigation;
-  const accent = hazard.postShaking
-    ? "var(--severity-moderate)"
-    : hazard.full
-      ? "var(--severity-low)"
-      : "var(--muted-foreground)";
-
-  return (
-    <section className="dc-card p-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-bold uppercase tracking-wider">Route readiness</h3>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-card-foreground/5 px-2.5 py-1 text-[11px] font-semibold text-card-foreground/70">
-          {hazard.shortLabel}
-          {hazard.full ? " · full plan" : " · seeded"}
-        </span>
-      </div>
-
-      <div className="mt-4 grid gap-4 sm:grid-cols-[auto_1fr] sm:items-start">
-        <span
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
-          style={{ background: `color-mix(in srgb, ${accent} 14%, transparent)` }}
-        >
-          <Icon className="h-5 w-5" style={{ color: accent }} aria-hidden="true" />
-        </span>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
-            First action
-          </p>
-          <p className="text-lg font-bold leading-snug" style={{ color: accent }}>
-            {hazard.firstAction}
-          </p>
-          <p className="mt-1 text-sm text-card-foreground/75">{decision.primaryInstruction}</p>
-        </div>
-      </div>
-
-      <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl bg-card-foreground/5 p-3">
-          <dt className="text-[11px] uppercase tracking-wider text-card-foreground/55">
-            Destination
-          </dt>
-          <dd className="mt-0.5 text-sm font-semibold">{hazard.destinationName}</dd>
-          <dd className="text-xs text-card-foreground/65">{hazard.destinationType}</dd>
-        </div>
-        <div className="rounded-xl bg-card-foreground/5 p-3">
-          <dt className="text-[11px] uppercase tracking-wider text-card-foreground/55">
-            Pre-mapped route
-          </dt>
-          <dd className="mt-0.5 text-sm font-semibold">{routeLine}</dd>
-          {hazard.postShaking && (
-            <dd className="text-xs text-card-foreground/65">
-              No route during shaking — assembly area is off the fault line.
-            </dd>
-          )}
-        </div>
-      </dl>
-
-      <p className="mt-4 text-[11px] italic text-card-foreground/60">
-        AI explains. Rules decide. The route is pre-mapped now so it is ready before the warning.
-      </p>
-    </section>
   );
 }
 
