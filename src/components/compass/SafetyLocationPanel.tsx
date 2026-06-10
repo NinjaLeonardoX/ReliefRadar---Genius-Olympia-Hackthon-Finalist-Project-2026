@@ -322,6 +322,106 @@ const LOCATION_TYPES = ["Home", "School", "Campus", "Community Center", "Church"
 const NAME_PRESETS = ["Home", "School", "Community Center"];
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Type-aware copy
+// ─────────────────────────────────────────────────────────────────────────────
+
+type TypeGroup = "home" | "school" | "business" | "community";
+
+function typeGroup(type: string): TypeGroup {
+  const t = type.toLowerCase();
+  if (t === "home") return "home";
+  if (t === "school" || t === "campus") return "school";
+  if (t === "business") return "business";
+  if (t === "community center" || t === "church") return "community";
+  return "home";
+}
+
+interface TypeCopy {
+  groupNoun: string;          // "household", "school community", ...
+  peopleTab: string;           // tab label
+  peopleHeading: string;       // panel heading
+  peopleIntro: string;         // descriptive sentence
+  baseTitle: string;           // wizard Base step title
+  baseIntro: string;           // wizard Base step description
+  planIntro: string;           // saved-location header description
+  attrs: { Icon: typeof Users; label: string; warn?: boolean }[];
+}
+
+const TYPE_COPY: Record<TypeGroup, TypeCopy> = {
+  home: {
+    groupNoun: "household",
+    peopleTab: "Household",
+    peopleHeading: "Who lives here",
+    peopleIntro: "Who needs to be accounted for when an alert fires — family, pets, and access needs.",
+    baseTitle: "Household Profile",
+    baseIntro: "Tell us about the people, pets, and access needs in your household so the plan accounts for everyone.",
+    planIntro: "Your household Compass Plan is ready. Review routes, fix gaps, or print the guide.",
+    attrs: [
+      { Icon: Users, label: "5 people" },
+      { Icon: UserRound, label: "Elderly 1" },
+      { Icon: Baby, label: "Toddler 1" },
+      { Icon: PawPrint, label: "Pet 1" },
+      { Icon: Car, label: "No vehicle", warn: true },
+      { Icon: Stethoscope, label: "Medical needs" },
+      { Icon: Accessibility, label: "Accessibility needs" },
+    ],
+  },
+  school: {
+    groupNoun: "school community",
+    peopleTab: "School community",
+    peopleHeading: "Who is on campus",
+    peopleIntro: "Students, staff, and visitors who must be accounted for during a drill or real event.",
+    baseTitle: "Campus Profile",
+    baseIntro: "Tell us about students, staff, and accessibility needs on campus so muster, shelter, and evacuation steps match the people on site.",
+    planIntro: "Your campus Compass Plan is ready. Review muster points, drill routes, and print the staff/parent guide.",
+    attrs: [
+      { Icon: Users, label: "Students on site" },
+      { Icon: UserRound, label: "Staff & teachers" },
+      { Icon: Baby, label: "Pre-K / early grades" },
+      { Icon: Accessibility, label: "Accessibility needs" },
+      { Icon: Stethoscope, label: "Nurse / medical needs" },
+      { Icon: Car, label: "Bus & parent pickup" },
+    ],
+  },
+  business: {
+    groupNoun: "team",
+    peopleTab: "Team & visitors",
+    peopleHeading: "Who is on site",
+    peopleIntro: "Employees, visitors, and shift coverage that need to be accounted for during an incident.",
+    baseTitle: "Workplace Profile",
+    baseIntro: "Tell us about employees, visitors, shifts, and ADA accommodations so the plan covers everyone in the building.",
+    planIntro: "Your workplace Compass Plan is ready. Review evacuation routes, fix gaps, or print the team guide.",
+    attrs: [
+      { Icon: Users, label: "Employees on shift" },
+      { Icon: UserRound, label: "Visitors / customers" },
+      { Icon: Accessibility, label: "ADA accommodations" },
+      { Icon: Stethoscope, label: "First-aid coverage" },
+      { Icon: Car, label: "Parking & exits" },
+    ],
+  },
+  community: {
+    groupNoun: "congregation",
+    peopleTab: "Members",
+    peopleHeading: "Who gathers here",
+    peopleIntro: "Members, volunteers, and any childcare or eldercare groups who use this space.",
+    baseTitle: "Community Profile",
+    baseIntro: "Tell us about members, volunteers, and any childcare or eldercare groups so the plan reflects everyone who gathers here.",
+    planIntro: "Your community Compass Plan is ready. Review routes, fix gaps, or print the member guide.",
+    attrs: [
+      { Icon: Users, label: "Members & attendees" },
+      { Icon: UserRound, label: "Volunteers" },
+      { Icon: Baby, label: "Childcare groups" },
+      { Icon: Accessibility, label: "Accessibility needs" },
+      { Icon: Stethoscope, label: "Medical needs" },
+    ],
+  },
+};
+
+function getTypeCopy(type: string): TypeCopy {
+  return TYPE_COPY[typeGroup(type)];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Scoring + generation
 // ─────────────────────────────────────────────────────────────────────────────
 
