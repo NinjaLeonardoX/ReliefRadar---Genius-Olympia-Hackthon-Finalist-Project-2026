@@ -149,23 +149,18 @@ export function RespondQuickAction() {
       {/* Map */}
       <MapPanel
         disaster="Flood"
-        routes={mapRoutes}
+        routes={routes}
         selectedRouteId={selectedRouteId}
         onSelectRoute={setSelectedRouteId}
         locationAware={hasRealLocation}
         destinations={
-          hasRealLocation && destReachable && destShelter
-            ? [{ id: destShelter.id, name: destShelter.name, lat: destShelter.lat, lng: destShelter.lng }]
+          destinations.length > 0
+            ? destinations.map((d) => ({ id: d.id, name: d.name, lat: d.lat, lng: d.lng }))
             : undefined
         }
       />
 
-      {hasRealLocation && !destReachable && (
-        <p className="rounded-xl border border-border bg-white px-4 py-2.5 text-center text-xs text-foreground/70 shadow-sm">
-          No seed shelter is within range of your live location — showing your area only.
-          Routes appear when you're within ~150 km of a configured shelter.
-        </p>
-      )}
+
 
       {/* Status confirmation */}
       {lastMessage && (
