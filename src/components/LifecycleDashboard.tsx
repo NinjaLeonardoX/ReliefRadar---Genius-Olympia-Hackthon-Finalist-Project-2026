@@ -20,7 +20,8 @@ export function LifecycleDashboard() {
         </p>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className={activePhase ? "grid gap-5" : "grid gap-5 lg:grid-cols-3"}>
+        {(!activePhase || activePhase === "prepare") && (
         <LifecycleCard
           phase="prepare"
           when="BEFORE"
