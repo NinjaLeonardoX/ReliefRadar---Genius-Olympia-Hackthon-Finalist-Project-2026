@@ -1360,24 +1360,124 @@ ${planBlocks}
                   </div>
                 )}
 
-                {/* Gaps tab */}
-                {bodyTab === "gaps" && (
-                  <div className="rounded-xl border border-border bg-surface/40 p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/55">
-                      Open Gaps
+                {/* Gaps tab — inline editable */}
+                {bodyTab === "gaps" && (() => {
+                  type OpenGap = { sectionId: SectionId; sectionTitle: string; key: string; question: string; gap: string };
+                  const openGaps: OpenGap[] = [];
+                  for (const s of SECTIONS) {
+                    if (selected.skipped[s.id]) continue;
+                    for (const q of s.questions) {
+                      if (selected.answers[s.id]?.[q.key] === "no" && q.gap) {
+                        openGaps.push({ sectionId: s.id, sectionTitle: s.title, key: q.key, question: q.q, gap: q.gap });
+                      }
+                    }
+                  }
+                  return (
+                    <div className="rounded-xl border border-border bg-surface/40 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/55">
+                        Open Gaps
+                      </p>
+                      <p className="mt-1 text-[11px] text-card-foreground/55">
+                        Mark a gap done to close it and raise your readiness percentage live.
+                      </p>
+                      {openGaps.length === 0 ? (
+                        <p className="mt-2 text-sm text-card-foreground/70">No open gaps recorded. Nicely done.</p>
+                      ) : (
+                        <ul className="mt-2 space-y-1.5">
+                          {openGaps.map((g) => (
+                            <li
+                              key={`${g.sectionId}:${g.key}`}
+                              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-background px-3 py-2"
+                            >
+                              <div className="flex min-w-0 items-start gap-1.5 text-sm">
+                                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--severity-moderate)]" />
+                                <div className="min-w-0">
+                                  <p className="font-medium text-foreground">{g.gap}</p>
+                                  <p className="text-[11px] text-card-foreground/55">
+                                    {g.sectionTitle} · {g.question}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => updateAnswer(selected.id, g.sectionId, g.key, "yes")}
+                                className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[color:var(--severity-low)] px-2.5 py-1 text-[11px] font-semibold text-white hover:brightness-110"
+                              >
+                                <Check className="h-3 w-3" /> Mark done
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Edit answers tab — full editable list grouped by section + category */}
+                {bodyTab === "answers" && (
+                  <div className="space-y-3">
+                    <p className="text-[11px] text-card-foreground/65">
+                      Flip any answer to update your preparedness score. Skip a section if it doesn't apply.
                     </p>
-                    {selected.gaps.length === 0 ? (
-                      <p className="mt-1 text-sm text-card-foreground/70">No open gaps recorded. Nicely done.</p>
-                    ) : (
-                      <ul className="mt-2 grid gap-1 sm:grid-cols-2">
-                        {selected.gaps.map((g) => (
-                          <li key={g} className="flex items-start gap-1.5 text-sm text-card-foreground/80">
-                            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--severity-moderate)]" />
-                            {g}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    {SECTIONS.map((section) => {
+                      const isSkipped = selected.skipped[section.id];
+                      const sectionAns = selected.answers[section.id] ?? {};
+                      const isHazard = section.id !== "base";
+                      const cats: QuestionCategory[] = isHazard ? ["know", "equip", "mental"] : [];
+                      return (
+                        <div key={section.id} className="rounded-xl border border-border bg-surface/40 p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-foreground">{section.title}</p>
+                            {isHazard && (
+                              <button
+                                onClick={() => toggleSectionSkip(selected.id, section.id)}
+                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                                  isSkipped
+                                    ? "bg-[color:var(--severity-moderate)]/15 text-[color:var(--severity-moderate)]"
+                                    : "border border-border bg-background text-card-foreground/70 hover:bg-surface"
+                                }`}
+                              >
+                                <SkipForward className="h-3 w-3" />
+                                {isSkipped ? "Skipped · tap to include" : "Skip this section"}
+                              </button>
+                            )}
+                          </div>
+                          {isHazard ? (
+                            cats.map((cat) => {
+                              const qs = section.questions.filter((q) => q.category === cat);
+                              if (qs.length === 0) return null;
+                              return (
+                                <div key={cat} className="mt-3">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-card-foreground/55">
+                                    {CATEGORY_META[cat].label}
+                                  </p>
+                                  <ul className="mt-1 space-y-1.5">
+                                    {qs.map((q) => (
+                                      <AnswerRow
+                                        key={q.key}
+                                        question={q.q}
+                                        value={sectionAns[q.key] ?? null}
+                                        onChange={(v) => updateAnswer(selected.id, section.id, q.key, v)}
+                                      />
+                                    ))}
+                                  </ul>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <ul className="mt-3 space-y-1.5">
+                              {section.questions.map((q) => (
+                                <AnswerRow
+                                  key={q.key}
+                                  question={q.q}
+                                  value={sectionAns[q.key] ?? null}
+                                  onChange={(v) => updateAnswer(selected.id, section.id, q.key, v)}
+                                />
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
