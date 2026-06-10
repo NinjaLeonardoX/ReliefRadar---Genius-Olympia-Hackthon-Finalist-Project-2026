@@ -5,12 +5,9 @@ import {
   Radar,
   Users,
   MapPin,
-  Navigation,
-  ShieldAlert,
   Building2,
   Landmark,
   Globe,
-  type LucideIcon,
 } from "lucide-react";
 import { HouseholdCard } from "../compass/HouseholdCard";
 import { SafetyLocationPanel } from "../compass/SafetyLocationPanel";
@@ -24,15 +21,11 @@ import {
   TOWN_READINESS,
   STATE_READINESS,
   NATIONAL_READINESS,
-  getHazard,
   getScopeMeta,
   readinessColor,
   type HazardRisk,
   type RollupData,
 } from "@/data/prepare";
-import { decideAction } from "@/lib/actions";
-import { getBestRoute, scoreRoute } from "@/lib/scoring";
-import { ROUTES } from "@/data/seed";
 import { useHousehold, useLocation } from "../LocationContext";
 import { RollupPanel } from "../RollupPanel";
 
@@ -167,10 +160,7 @@ export function PreparePhase() {
 
       <RollupPanel />
 
-      {/* 2 · ROUTE READINESS */}
-      <RouteReadinessPanel hazard={selectedHazard} />
-
-      {/* 3 · READINESS — rolls up from household to national */}
+      {/* 2 · READINESS — rolls up from household to national */}
       <section className="space-y-4">
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-card-foreground">
