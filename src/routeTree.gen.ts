@@ -19,6 +19,11 @@ import { Route as CompassRouteImport } from './routes/compass'
 import { Route as AiDisclosureRouteImport } from './routes/ai-disclosure'
 import { Route as ActionPlanRouteImport } from './routes/action-plan'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompassIndexRouteImport } from './routes/compass.index'
+import { Route as CompassRespondRouteImport } from './routes/compass.respond'
+import { Route as CompassRecoverRouteImport } from './routes/compass.recover'
+import { Route as CompassPrepareRouteImport } from './routes/compass.prepare'
+import { Route as ApiTilesZXYRouteImport } from './routes/api/tiles.$z.$x.$y'
 
 const SolutionRoute = SolutionRouteImport.update({
   id: '/solution',
@@ -70,43 +75,82 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompassIndexRoute = CompassIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CompassRoute,
+} as any)
+const CompassRespondRoute = CompassRespondRouteImport.update({
+  id: '/respond',
+  path: '/respond',
+  getParentRoute: () => CompassRoute,
+} as any)
+const CompassRecoverRoute = CompassRecoverRouteImport.update({
+  id: '/recover',
+  path: '/recover',
+  getParentRoute: () => CompassRoute,
+} as any)
+const CompassPrepareRoute = CompassPrepareRouteImport.update({
+  id: '/prepare',
+  path: '/prepare',
+  getParentRoute: () => CompassRoute,
+} as any)
+const ApiTilesZXYRoute = ApiTilesZXYRouteImport.update({
+  id: '/api/tiles/$z/$x/$y',
+  path: '/api/tiles/$z/$x/$y',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/action-plan': typeof ActionPlanRoute
   '/ai-disclosure': typeof AiDisclosureRoute
-  '/compass': typeof CompassRoute
+  '/compass': typeof CompassRouteWithChildren
   '/map': typeof MapRoute
   '/methodology': typeof MethodologyRoute
   '/presentation': typeof PresentationRoute
   '/report': typeof ReportRoute
   '/shelters-routes': typeof SheltersRoutesRoute
   '/solution': typeof SolutionRoute
+  '/compass/prepare': typeof CompassPrepareRoute
+  '/compass/recover': typeof CompassRecoverRoute
+  '/compass/respond': typeof CompassRespondRoute
+  '/compass/': typeof CompassIndexRoute
+  '/api/tiles/$z/$x/$y': typeof ApiTilesZXYRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/action-plan': typeof ActionPlanRoute
   '/ai-disclosure': typeof AiDisclosureRoute
-  '/compass': typeof CompassRoute
   '/map': typeof MapRoute
   '/methodology': typeof MethodologyRoute
   '/presentation': typeof PresentationRoute
   '/report': typeof ReportRoute
   '/shelters-routes': typeof SheltersRoutesRoute
   '/solution': typeof SolutionRoute
+  '/compass/prepare': typeof CompassPrepareRoute
+  '/compass/recover': typeof CompassRecoverRoute
+  '/compass/respond': typeof CompassRespondRoute
+  '/compass': typeof CompassIndexRoute
+  '/api/tiles/$z/$x/$y': typeof ApiTilesZXYRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/action-plan': typeof ActionPlanRoute
   '/ai-disclosure': typeof AiDisclosureRoute
-  '/compass': typeof CompassRoute
+  '/compass': typeof CompassRouteWithChildren
   '/map': typeof MapRoute
   '/methodology': typeof MethodologyRoute
   '/presentation': typeof PresentationRoute
   '/report': typeof ReportRoute
   '/shelters-routes': typeof SheltersRoutesRoute
   '/solution': typeof SolutionRoute
+  '/compass/prepare': typeof CompassPrepareRoute
+  '/compass/recover': typeof CompassRecoverRoute
+  '/compass/respond': typeof CompassRespondRoute
+  '/compass/': typeof CompassIndexRoute
+  '/api/tiles/$z/$x/$y': typeof ApiTilesZXYRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,18 +165,27 @@ export interface FileRouteTypes {
     | '/report'
     | '/shelters-routes'
     | '/solution'
+    | '/compass/prepare'
+    | '/compass/recover'
+    | '/compass/respond'
+    | '/compass/'
+    | '/api/tiles/$z/$x/$y'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/action-plan'
     | '/ai-disclosure'
-    | '/compass'
     | '/map'
     | '/methodology'
     | '/presentation'
     | '/report'
     | '/shelters-routes'
     | '/solution'
+    | '/compass/prepare'
+    | '/compass/recover'
+    | '/compass/respond'
+    | '/compass'
+    | '/api/tiles/$z/$x/$y'
   id:
     | '__root__'
     | '/'
@@ -145,19 +198,25 @@ export interface FileRouteTypes {
     | '/report'
     | '/shelters-routes'
     | '/solution'
+    | '/compass/prepare'
+    | '/compass/recover'
+    | '/compass/respond'
+    | '/compass/'
+    | '/api/tiles/$z/$x/$y'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActionPlanRoute: typeof ActionPlanRoute
   AiDisclosureRoute: typeof AiDisclosureRoute
-  CompassRoute: typeof CompassRoute
+  CompassRoute: typeof CompassRouteWithChildren
   MapRoute: typeof MapRoute
   MethodologyRoute: typeof MethodologyRoute
   PresentationRoute: typeof PresentationRoute
   ReportRoute: typeof ReportRoute
   SheltersRoutesRoute: typeof SheltersRoutesRoute
   SolutionRoute: typeof SolutionRoute
+  ApiTilesZXYRoute: typeof ApiTilesZXYRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,20 +291,73 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compass/': {
+      id: '/compass/'
+      path: '/'
+      fullPath: '/compass/'
+      preLoaderRoute: typeof CompassIndexRouteImport
+      parentRoute: typeof CompassRoute
+    }
+    '/compass/respond': {
+      id: '/compass/respond'
+      path: '/respond'
+      fullPath: '/compass/respond'
+      preLoaderRoute: typeof CompassRespondRouteImport
+      parentRoute: typeof CompassRoute
+    }
+    '/compass/recover': {
+      id: '/compass/recover'
+      path: '/recover'
+      fullPath: '/compass/recover'
+      preLoaderRoute: typeof CompassRecoverRouteImport
+      parentRoute: typeof CompassRoute
+    }
+    '/compass/prepare': {
+      id: '/compass/prepare'
+      path: '/prepare'
+      fullPath: '/compass/prepare'
+      preLoaderRoute: typeof CompassPrepareRouteImport
+      parentRoute: typeof CompassRoute
+    }
+    '/api/tiles/$z/$x/$y': {
+      id: '/api/tiles/$z/$x/$y'
+      path: '/api/tiles/$z/$x/$y'
+      fullPath: '/api/tiles/$z/$x/$y'
+      preLoaderRoute: typeof ApiTilesZXYRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface CompassRouteChildren {
+  CompassPrepareRoute: typeof CompassPrepareRoute
+  CompassRecoverRoute: typeof CompassRecoverRoute
+  CompassRespondRoute: typeof CompassRespondRoute
+  CompassIndexRoute: typeof CompassIndexRoute
+}
+
+const CompassRouteChildren: CompassRouteChildren = {
+  CompassPrepareRoute: CompassPrepareRoute,
+  CompassRecoverRoute: CompassRecoverRoute,
+  CompassRespondRoute: CompassRespondRoute,
+  CompassIndexRoute: CompassIndexRoute,
+}
+
+const CompassRouteWithChildren =
+  CompassRoute._addFileChildren(CompassRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActionPlanRoute: ActionPlanRoute,
   AiDisclosureRoute: AiDisclosureRoute,
-  CompassRoute: CompassRoute,
+  CompassRoute: CompassRouteWithChildren,
   MapRoute: MapRoute,
   MethodologyRoute: MethodologyRoute,
   PresentationRoute: PresentationRoute,
   ReportRoute: ReportRoute,
   SheltersRoutesRoute: SheltersRoutesRoute,
   SolutionRoute: SolutionRoute,
+  ApiTilesZXYRoute: ApiTilesZXYRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

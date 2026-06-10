@@ -40,8 +40,8 @@ function AIDisclosurePage() {
     >
       <div className="space-y-8">
         <p className="max-w-3xl text-base text-foreground/75">
-          Disaster Compass was built by a two-student team during the official competition window.
-          We used AI tools to assist development; all architecture, data design, and final decisions
+          Disaster Compass was built by a two-student team during the official competition window. We
+          used AI tools to assist development; all architecture, data design, and final decisions
           were made by us, and no code or designs were copied.
         </p>
 

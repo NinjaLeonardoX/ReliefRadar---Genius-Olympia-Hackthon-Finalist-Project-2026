@@ -52,11 +52,11 @@ export function LifecycleCard({
       type="button"
       onClick={onSelect}
       className={[
-        "group dc-hover-lift relative flex flex-col overflow-hidden rounded-3xl text-left text-white transition-all",
-        "min-h-[340px] border",
+        "group dc-hover-lift relative flex flex-col overflow-hidden rounded-3xl text-left text-white transition-all duration-300 ease-out hover:scale-[1.03]",
+        "min-h-[340px] border cursor-pointer",
         active
           ? "border-[color:var(--severity-low)]/70 ring-2 ring-[color:var(--severity-low)]/60 shadow-[0_24px_70px_-20px_rgba(22,163,74,0.55)]"
-          : "border-white/10 shadow-[0_18px_55px_rgba(15,26,46,0.35)]",
+          : "border-white/10 shadow-[0_18px_55px_rgba(15,26,46,0.35)] hover:shadow-[0_24px_70px_-20px_rgba(15,26,46,0.55)]",
       ].join(" ")}
     >
       {/* Cinematic visual layer */}

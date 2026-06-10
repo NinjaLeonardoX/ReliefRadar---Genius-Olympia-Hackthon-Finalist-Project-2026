@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
 import { Users, Baby, PawPrint, Car, Stethoscope, Accessibility, UserRound, MapPin } from "lucide-react";
 import { useLocation } from "@/components/LocationContext";
 
 interface Props {
   onGeneratePlan?: () => void;
+  riskMap?: ReactNode;
 }
 
 const ATTRS = [
@@ -15,7 +17,7 @@ const ATTRS = [
   { Icon: Accessibility, label: "Accessibility needs" },
 ];
 
-export function HouseholdCard({ onGeneratePlan }: Props) {
+export function HouseholdCard({ onGeneratePlan, riskMap }: Props) {
   const { household, activeAddress, resolved, source } = useLocation();
 
   const title = activeAddress?.name ?? "Your household";
@@ -64,6 +66,9 @@ export function HouseholdCard({ onGeneratePlan }: Props) {
           Household composition is illustrative. Set your address above to anchor the plan to your real location.
         </p>
       )}
+      {riskMap ? (
+        <div className="mt-5 border-t border-border/60 pt-5">{riskMap}</div>
+      ) : null}
       <button
         type="button"
         onClick={onGeneratePlan}
