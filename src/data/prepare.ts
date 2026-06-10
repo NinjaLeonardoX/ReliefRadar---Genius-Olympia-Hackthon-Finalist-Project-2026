@@ -191,3 +191,77 @@ export const PREPARE_GAPS: PrepareGap[] = [
 export const SNAPSHOT_READINESS = 60;
 export const SNAPSHOT_OPEN_GAPS = PREPARE_GAPS.filter((g) => !g.closedByDefault).length;
 export const SNAPSHOT_TOP_GAP = PREPARE_GAPS.find((g) => !g.closedByDefault)?.label ?? "";
+
+// ---- Readiness scope (whose readiness am I looking at?) ----
+
+export type ReadinessScope = "family" | "community" | "town";
+
+export interface ScopeMeta {
+  id: ReadinessScope;
+  tab: string;
+  owner: string;
+  blurb: string;
+}
+
+export const SCOPES: ScopeMeta[] = [
+  {
+    id: "family",
+    tab: "My Family",
+    owner: "Rivera Family",
+    blurb: "your household profile and the gaps to close before the warning.",
+  },
+  {
+    id: "community",
+    tab: "My Community",
+    owner: "North Creek block",
+    blurb: "your 5 neighboring households and who still needs pre-disaster support.",
+  },
+  {
+    id: "town",
+    tab: "My Town",
+    owner: "North Creek",
+    blurb: "a town-wide rollup across households, shelters, and transport.",
+  },
+];
+
+export function getScope(id: ReadinessScope): ScopeMeta {
+  return SCOPES.find((s) => s.id === id) ?? SCOPES[0];
+}
+
+/** Readiness color by percentage — shared by rings and bars. */
+export function readinessColor(value: number): string {
+  if (value >= 80) return "var(--severity-low)";
+  if (value >= 50) return "var(--severity-moderate)";
+  return "var(--severity-critical)";
+}
+
+export interface CommunityMember {
+  name: string;
+  readiness: number;
+  note: string;
+}
+
+// Five households on the Rivera block. "Need support" = readiness < 80.
+export const COMMUNITY_MEMBERS: CommunityMember[] = [
+  { name: "Rivera Family", readiness: 60, note: "Ride + backup-power gaps still open." },
+  { name: "Chen", readiness: 100, note: "Rehearsed — sheltering plan with high-ground relatives." },
+  { name: "Miller", readiness: 90, note: "Go-bag ready; confirming a check-in contact." },
+  { name: "Johnson", readiness: 100, note: "Go-bag packed, Hilltop shelter confirmed." },
+  { name: "Patel", readiness: 70, note: "Insulin resupply plan still pending." },
+];
+
+export interface TownStat {
+  label: string;
+  value: string;
+}
+
+export const TOWN_READINESS: { readiness: number; stats: TownStat[]; note: string } = {
+  readiness: 72,
+  stats: [
+    { label: "Households ready", value: "3 of 5" },
+    { label: "Shelters prep-confirmed", value: "2 of 3" },
+    { label: "Drivers pre-matched", value: "1" },
+    { label: "Open support requests", value: "2" },
+  ],
+  note: "North Creek is mostly rehearsed. Two households still need pre-disaster support, and one shelter needs an accessibility upgrade, before the next warning.",
+};

@@ -115,10 +115,10 @@ function PrepareSnapshot() {
       <div className="flex items-center gap-3">
         <MiniRing value={SNAPSHOT_READINESS} />
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">
-            Readiness
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">
+            My Family · Rivera
           </p>
-          <p className="text-2xl font-bold leading-none">{SNAPSHOT_READINESS}%</p>
+          <p className="text-2xl font-bold leading-none text-white">{SNAPSHOT_READINESS}% ready</p>
         </div>
       </div>
 
@@ -126,7 +126,7 @@ function PrepareSnapshot() {
         {HAZARD_RISKS.map((h) => (
           <span
             key={h.id}
-            className="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-1.5 py-1 text-[10px] font-medium text-white/85 ring-1 ring-white/10"
+            className="inline-flex items-center gap-1.5 rounded-md bg-white/15 px-1.5 py-1 text-[10px] font-semibold text-white ring-1 ring-white/15"
           >
             {h.shortLabel}
             <SnapshotBars severity={h.severity} />
@@ -134,8 +134,9 @@ function PrepareSnapshot() {
         ))}
       </div>
 
-      <p className="rounded-lg bg-[color:var(--severity-moderate)]/20 px-2.5 py-1.5 text-[11px] font-medium text-[color:var(--severity-moderate)] ring-1 ring-[color:var(--severity-moderate)]/30">
-        ⚠ {SNAPSHOT_OPEN_GAPS} gaps before you're ready — top: {SNAPSHOT_TOP_GAP.toLowerCase()}.
+      <p className="rounded-lg bg-[color:var(--severity-moderate)] px-2.5 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/20">
+        ⚠ {SNAPSHOT_OPEN_GAPS} gaps before you&rsquo;re ready — top:{" "}
+        {SNAPSHOT_TOP_GAP.toLowerCase()}.
       </p>
     </div>
   );
@@ -149,7 +150,7 @@ function RespondSnapshot() {
         <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
         Go to higher ground
       </span>
-      <p className="text-xs font-medium text-white/80">Route B · score 91</p>
+      <p className="text-xs font-semibold text-white/90">Route B · score 91</p>
     </div>
   );
 }
@@ -162,7 +163,7 @@ function RecoverSnapshot() {
         <Camera className="h-4 w-4" aria-hidden="true" />
         Next: photograph the water line
       </span>
-      <p className="text-xs font-medium text-white/80">Step 1 of 6 · packet ready</p>
+      <p className="text-xs font-semibold text-white/90">Step 1 of 6 · packet ready</p>
     </div>
   );
 }

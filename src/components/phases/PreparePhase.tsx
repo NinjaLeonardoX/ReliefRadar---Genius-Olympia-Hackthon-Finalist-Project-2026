@@ -7,16 +7,23 @@ import {
   MapPin,
   Navigation,
   ShieldAlert,
+  Home,
+  Building2,
 } from "lucide-react";
 import { HouseholdCard } from "../compass/HouseholdCard";
 import { VolunteerMatchCard } from "../compass/VolunteerMatchCard";
-import { usePhase } from "../PhaseContext";
 import {
   HAZARD_RISKS,
   PREPARE_GAPS,
   SEVERITY_META,
+  SCOPES,
+  COMMUNITY_MEMBERS,
+  TOWN_READINESS,
   getHazard,
+  getScope,
+  readinessColor,
   type HazardRisk,
+  type ReadinessScope,
 } from "@/data/prepare";
 import { decideAction } from "@/lib/actions";
 import { getBestRoute, scoreRoute } from "@/lib/scoring";
@@ -27,8 +34,8 @@ import { ROUTES, RIVERA_HOUSEHOLD } from "@/data/seed";
 const PrepareRiskMap = lazy(() => import("../compass/PrepareRiskMap"));
 
 export function PreparePhase() {
-  const { mode } = usePhase();
   const [selectedId, setSelectedId] = useState<string>("flood");
+  const [scope, setScope] = useState<ReadinessScope>("family");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -41,6 +48,7 @@ export function PreparePhase() {
   const readiness = useMemo(() => Math.round((closed.size / PREPARE_GAPS.length) * 100), [closed]);
 
   const selectedHazard = getHazard(selectedId);
+  const scopeMeta = getScope(scope);
 
   function closeGap(id: string) {
     setClosed((s) => new Set(s).add(id));
@@ -135,136 +143,284 @@ export function PreparePhase() {
       {/* 2 · ROUTE READINESS */}
       <RouteReadinessPanel hazard={selectedHazard} />
 
-      {/* 3 · READINESS GAPS */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <div className="dc-card p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold tracking-tight">
-                  Readiness gaps for Rivera Family
-                </h3>
-                <p className="mt-1 text-sm text-card-foreground/70">
-                  Close gaps before the warning. Each fix raises the score live.
-                </p>
-              </div>
-              <ReadinessRing value={readiness} />
-            </div>
+      {/* 3 · READINESS — scoped (whose readiness?) */}
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-card-foreground">
+              Who&rsquo;s ready?
+            </h3>
+            <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
+              Readiness for{" "}
+              <span className="font-semibold text-card-foreground">{scopeMeta.owner}</span> —{" "}
+              {scopeMeta.blurb}
+            </p>
+          </div>
+          <ScopeTabs value={scope} onChange={setScope} />
+        </div>
 
-            <ul className="mt-5 space-y-3">
-              {PREPARE_GAPS.map((g) => {
-                const isClosed = closed.has(g.id);
-                const showRideMatch = g.id === "ride" && rideMatchOpen && !isClosed;
-                return (
-                  <li
-                    key={g.id}
-                    className={[
-                      "rounded-xl border p-4 transition-colors",
-                      isClosed
-                        ? "border-[color:var(--severity-low)]/40 bg-[color:var(--severity-low)]/5"
-                        : "border-[color:var(--severity-moderate)]/40 bg-[color:var(--severity-moderate)]/5",
-                    ].join(" ")}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-2.5">
-                        {isClosed ? (
-                          <CheckCircle2 className="mt-0.5 h-5 w-5 text-[color:var(--severity-low)]" />
-                        ) : (
-                          <AlertTriangle className="mt-0.5 h-5 w-5 text-[color:var(--severity-moderate)]" />
-                        )}
-                        <div>
-                          <p className="font-semibold">{isClosed ? g.fixedLabel : g.label}</p>
-                          {!isClosed && (
-                            <p className="mt-0.5 text-xs text-card-foreground/70">{g.detail}</p>
+        {scope === "family" && (
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
+              <div className="dc-card p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-bold tracking-tight">
+                      Readiness gaps for Rivera Family
+                    </h3>
+                    <p className="mt-1 text-sm text-card-foreground/70">
+                      Close gaps before the warning. Each fix raises the score live.
+                    </p>
+                  </div>
+                  <ReadinessRing value={readiness} />
+                </div>
+
+                <ul className="mt-5 space-y-3">
+                  {PREPARE_GAPS.map((g) => {
+                    const isClosed = closed.has(g.id);
+                    const showRideMatch = g.id === "ride" && rideMatchOpen && !isClosed;
+                    return (
+                      <li
+                        key={g.id}
+                        className={[
+                          "rounded-xl border p-4 transition-colors",
+                          isClosed
+                            ? "border-[color:var(--severity-low)]/40 bg-[color:var(--severity-low)]/5"
+                            : "border-[color:var(--severity-moderate)]/40 bg-[color:var(--severity-moderate)]/5",
+                        ].join(" ")}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-2.5">
+                            {isClosed ? (
+                              <CheckCircle2 className="mt-0.5 h-5 w-5 text-[color:var(--severity-low)]" />
+                            ) : (
+                              <AlertTriangle className="mt-0.5 h-5 w-5 text-[color:var(--severity-moderate)]" />
+                            )}
+                            <div>
+                              <p className="font-semibold">{isClosed ? g.fixedLabel : g.label}</p>
+                              {!isClosed && (
+                                <p className="mt-0.5 text-xs text-card-foreground/70">{g.detail}</p>
+                              )}
+                            </div>
+                          </div>
+                          {!isClosed && !showRideMatch && (
+                            <button
+                              onClick={() =>
+                                g.fix === "volunteer" ? setRideMatchOpen(true) : closeGap(g.id)
+                              }
+                              className="shrink-0 rounded-full bg-[color:var(--foreground)] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110"
+                            >
+                              {g.fix === "volunteer"
+                                ? "Pre-assign ride"
+                                : g.id === "power"
+                                  ? "Mark plan"
+                                  : "Mark ready"}
+                            </button>
                           )}
                         </div>
-                      </div>
-                      {!isClosed && !showRideMatch && (
-                        <button
-                          onClick={() =>
-                            g.fix === "volunteer" ? setRideMatchOpen(true) : closeGap(g.id)
-                          }
-                          className="shrink-0 rounded-full bg-[color:var(--foreground)] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110"
-                        >
-                          {g.fix === "volunteer"
-                            ? "Pre-assign ride"
-                            : g.id === "power"
-                              ? "Mark plan"
-                              : "Mark ready"}
-                        </button>
-                      )}
-                    </div>
 
-                    {/* Ride gap → reuse Volunteer Match to pre-assign a driver */}
-                    {showRideMatch && (
-                      <div className="mt-3">
-                        <VolunteerMatchCard
-                          volunteerApproved={false}
-                          onApprove={() => {
-                            closeGap("ride");
-                            setRideMatchOpen(false);
-                          }}
-                        />
-                        <p className="mt-2 text-[11px] text-card-foreground/60">
-                          Pre-assigning now means the siren executes the plan instead of starting
-                          it.
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+                        {/* Ride gap → reuse Volunteer Match to pre-assign a driver */}
+                        {showRideMatch && (
+                          <div className="mt-3">
+                            <VolunteerMatchCard
+                              volunteerApproved={false}
+                              onApprove={() => {
+                                closeGap("ride");
+                                setRideMatchOpen(false);
+                              }}
+                            />
+                            <p className="mt-2 text-[11px] text-card-foreground/60">
+                              Pre-assigning now means the siren executes the plan instead of
+                              starting it.
+                            </p>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
 
-            {readiness === 100 && (
-              <div className="mt-5 rounded-xl bg-[color:var(--severity-low)]/10 p-4 text-sm font-medium text-[color:var(--severity-low)] ring-1 ring-[color:var(--severity-low)]/30">
-                Rivera Family is rehearsed. Transport pre-matched, shelter confirmed. The siren no
-                longer starts the plan — it executes it.
-              </div>
-            )}
-          </div>
-
-          {mode === "community" && (
-            <div className="dc-card p-5">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-[color:var(--severity-low)]" />
-                <h3 className="text-sm font-bold uppercase tracking-wider">Community readiness</h3>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  { l: "Households analyzed", v: 5 },
-                  { l: "Need pre-disaster support", v: 2 },
-                  { l: "Transport gap", v: 1 },
-                  { l: "Medicine gap", v: 1 },
-                ].map((c) => (
-                  <div key={c.l} className="rounded-xl bg-card-foreground/5 p-3">
-                    <p className="text-2xl font-bold">{c.v}</p>
-                    <p className="mt-1 text-[11px] text-card-foreground/70">{c.l}</p>
+                {readiness === 100 && (
+                  <div className="mt-5 rounded-xl bg-[color:var(--severity-low)]/10 p-4 text-sm font-medium text-[color:var(--severity-low)] ring-1 ring-[color:var(--severity-low)]/30">
+                    Rivera Family is rehearsed. Transport pre-matched, shelter confirmed. The siren
+                    no longer starts the plan — it executes it.
                   </div>
-                ))}
+                )}
               </div>
-              <p className="mt-4 text-xs text-card-foreground/65 italic">
-                3 households ready/shelter-ready. 2 need pre-disaster support before the next
-                warning.
-              </p>
             </div>
-          )}
-        </div>
 
-        <div className="space-y-6">
-          <HouseholdCard />
-          <div className="dc-card p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
-              Preparedness signature
-            </p>
-            <p className="mt-2 text-sm font-medium text-card-foreground">
-              Preparedness is rehearsal that solves the evacuation before the siren.
-            </p>
-            <p className="mt-3 text-xs text-card-foreground/65">
-              Rivera Family should be pre-matched with transport before flood risk increases.
+            <div className="space-y-6">
+              <HouseholdCard />
+              <div className="dc-card p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
+                  Preparedness signature
+                </p>
+                <p className="mt-2 text-sm font-medium text-card-foreground">
+                  Preparedness is rehearsal that solves the evacuation before the siren.
+                </p>
+                <p className="mt-3 text-xs text-card-foreground/65">
+                  Rivera Family should be pre-matched with transport before flood risk increases.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {scope === "community" && <CommunityReadinessPanel />}
+        {scope === "town" && <TownReadinessPanel />}
+      </section>
+    </div>
+  );
+}
+
+function ScopeTabs({
+  value,
+  onChange,
+}: {
+  value: ReadinessScope;
+  onChange: (s: ReadinessScope) => void;
+}) {
+  const ICONS: Record<ReadinessScope, typeof Home> = {
+    family: Home,
+    community: Users,
+    town: Building2,
+  };
+  return (
+    <div
+      role="tablist"
+      aria-label="Readiness scope"
+      className="inline-flex rounded-full border border-border bg-white p-1 shadow-sm"
+    >
+      {SCOPES.map((s) => {
+        const active = s.id === value;
+        const Icon = ICONS[s.id];
+        return (
+          <button
+            key={s.id}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(s.id)}
+            className={[
+              "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors",
+              active
+                ? "bg-[color:var(--foreground)] text-white shadow-sm"
+                : "text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]",
+            ].join(" ")}
+          >
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            {s.tab}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ReadinessBar({ value }: { value: number }) {
+  return (
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-card-foreground/10">
+      <div
+        className="h-full rounded-full"
+        style={{ width: `${value}%`, background: readinessColor(value) }}
+      />
+    </div>
+  );
+}
+
+function CommunityReadinessPanel() {
+  const ready = COMMUNITY_MEMBERS.filter((m) => m.readiness >= 80).length;
+  const avg = Math.round(
+    COMMUNITY_MEMBERS.reduce((sum, m) => sum + m.readiness, 0) / COMMUNITY_MEMBERS.length,
+  );
+  return (
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="dc-card p-6 lg:col-span-2">
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-[color:var(--severity-low)]" aria-hidden="true" />
+          <h3 className="text-sm font-bold uppercase tracking-wider">
+            North Creek block · 5 households
+          </h3>
+        </div>
+        <ul className="mt-4 space-y-3">
+          {COMMUNITY_MEMBERS.map((m) => (
+            <li key={m.name} className="rounded-xl border border-border bg-white p-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-semibold text-card-foreground">{m.name}</p>
+                <span
+                  className="text-sm font-bold tabular-nums"
+                  style={{ color: readinessColor(m.readiness) }}
+                >
+                  {m.readiness}%
+                </span>
+              </div>
+              <div className="mt-2">
+                <ReadinessBar value={m.readiness} />
+              </div>
+              <p className="mt-1.5 text-xs text-card-foreground/70">{m.note}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="space-y-6">
+        <div className="dc-card flex items-center gap-4 p-6">
+          <ReadinessRing value={avg} />
+          <div>
+            <p className="text-2xl font-bold leading-none text-card-foreground">{ready} of 5</p>
+            <p className="mt-1 text-sm text-card-foreground/70">households ready</p>
+            <p className="mt-2 text-xs text-card-foreground/60">
+              {COMMUNITY_MEMBERS.length - ready} still need pre-disaster support.
             </p>
           </div>
         </div>
+        <div className="dc-card p-5">
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { l: "Households analyzed", v: 5 },
+              { l: "Need support", v: 2 },
+              { l: "Transport gap", v: 1 },
+              { l: "Medicine gap", v: 1 },
+            ].map((c) => (
+              <div key={c.l} className="rounded-xl bg-card-foreground/5 p-3">
+                <p className="text-2xl font-bold text-card-foreground">{c.v}</p>
+                <p className="mt-1 text-[11px] text-card-foreground/70">{c.l}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs italic text-card-foreground/65">
+            3 households rehearsed. 2 need pre-disaster support before the next warning.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TownReadinessPanel() {
+  return (
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="dc-card p-6 lg:col-span-2">
+        <div className="flex items-center gap-2">
+          <Building2 className="h-4 w-4 text-[color:var(--severity-low)]" aria-hidden="true" />
+          <h3 className="text-sm font-bold uppercase tracking-wider">North Creek · town-wide</h3>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {TOWN_READINESS.stats.map((s) => (
+            <div key={s.label} className="rounded-xl bg-card-foreground/5 p-3">
+              <p className="text-xl font-bold text-card-foreground">{s.value}</p>
+              <p className="mt-1 text-[11px] text-card-foreground/70">{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-card-foreground/75">{TOWN_READINESS.note}</p>
+      </div>
+
+      <div className="dc-card flex flex-col items-center justify-center gap-2 p-6 text-center">
+        <ReadinessRing value={TOWN_READINESS.readiness} />
+        <p className="text-sm font-semibold text-card-foreground">Town readiness</p>
+        <p className="text-xs text-card-foreground/60">
+          Aggregated across households, shelters, and transport coverage.
+        </p>
       </div>
     </div>
   );
