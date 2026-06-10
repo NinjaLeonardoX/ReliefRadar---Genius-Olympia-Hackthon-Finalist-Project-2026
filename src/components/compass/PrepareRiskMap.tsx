@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Polygon, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FLOOD_POLYGON, MAP_CENTER, MAP_ZOOM } from "@/data/seed";
-import { useHousehold } from "@/components/LocationContext";
+import { useHousehold, useLocation } from "@/components/LocationContext";
 import {
   ASSEMBLY_POINT,
   FAULT_LINE_BAND,
@@ -30,6 +30,8 @@ interface Props {
 
 export default function PrepareRiskMap({ selectedHazardId, onSelectHazard }: Props) {
   const household = useHousehold();
+  const { activeAddress } = useLocation();
+  const markerLabel = activeAddress?.name ?? "Your location";
   const zonedHazards = HAZARD_RISKS.filter((h) => h.zone !== null);
   const center: [number, number] =
     household.lat && household.lng ? [household.lat, household.lng] : MAP_CENTER;
@@ -78,7 +80,7 @@ export default function PrepareRiskMap({ selectedHazardId, onSelectHazard }: Pro
           pathOptions={{ color: "#ffffff", weight: 2, fillColor: "#475569", fillOpacity: 1 }}
         >
           <Tooltip permanent direction="top" offset={[0, -8]}>
-            🏠 {household.name}
+            🏠 {markerLabel}
           </Tooltip>
         </CircleMarker>
 

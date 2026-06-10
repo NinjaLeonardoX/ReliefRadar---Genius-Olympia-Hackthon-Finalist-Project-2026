@@ -148,7 +148,7 @@ export const PREPARE_GAPS: PrepareGap[] = [
   {
     id: "ride",
     label: "No ride arranged",
-    detail: "Rivera has no vehicle. Pre-match a volunteer driver before any warning.",
+    detail: "No vehicle available. Pre-match a volunteer driver before any warning.",
     fixedLabel: "Ride pre-assigned: Ana (truck · pet + accessibility)",
     fix: "volunteer",
     closedByDefault: false,
@@ -209,7 +209,7 @@ export const SCOPE_META: ScopeMeta[] = [
   {
     id: "household",
     label: "Household",
-    place: "Rivera family",
+    place: "your household",
     blurb: "your household profile and the gaps to close before the warning.",
     context: false,
   },
@@ -260,13 +260,13 @@ export interface CommunityMember {
   note: string;
 }
 
-// Five households on the Rivera block. "Need support" = readiness < 80.
+// Five households on a typical block. "Need support" = readiness < 80.
 export const COMMUNITY_MEMBERS: CommunityMember[] = [
-  { name: "Rivera Family", readiness: 60, note: "Ride + backup-power gaps still open." },
-  { name: "Chen", readiness: 100, note: "Rehearsed — sheltering plan with high-ground relatives." },
-  { name: "Miller", readiness: 90, note: "Go-bag ready; confirming a check-in contact." },
-  { name: "Johnson", readiness: 100, note: "Go-bag packed, Hilltop shelter confirmed." },
-  { name: "Patel", readiness: 70, note: "Insulin resupply plan still pending." },
+  { name: "Household 1", readiness: 60, note: "Ride + backup-power gaps still open." },
+  { name: "Household 2", readiness: 100, note: "Rehearsed — sheltering plan with high-ground relatives." },
+  { name: "Household 3", readiness: 90, note: "Go-bag ready; confirming a check-in contact." },
+  { name: "Household 4", readiness: 100, note: "Go-bag packed, shelter confirmed." },
+  { name: "Household 5", readiness: 70, note: "Medication resupply plan still pending." },
 ];
 
 export interface TownStat {
