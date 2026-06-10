@@ -23,6 +23,7 @@ import { Route as CompassIndexRouteImport } from './routes/compass.index'
 import { Route as CompassRespondRouteImport } from './routes/compass.respond'
 import { Route as CompassRecoverRouteImport } from './routes/compass.recover'
 import { Route as CompassPrepareRouteImport } from './routes/compass.prepare'
+import { Route as ApiTilesZXYRouteImport } from './routes/api/tiles.$z.$x.$y'
 
 const SolutionRoute = SolutionRouteImport.update({
   id: '/solution',
@@ -94,6 +95,11 @@ const CompassPrepareRoute = CompassPrepareRouteImport.update({
   path: '/prepare',
   getParentRoute: () => CompassRoute,
 } as any)
+const ApiTilesZXYRoute = ApiTilesZXYRouteImport.update({
+  id: '/api/tiles/$z/$x/$y',
+  path: '/api/tiles/$z/$x/$y',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/compass/recover': typeof CompassRecoverRoute
   '/compass/respond': typeof CompassRespondRoute
   '/compass/': typeof CompassIndexRoute
+  '/api/tiles/$z/$x/$y': typeof ApiTilesZXYRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/compass/recover': typeof CompassRecoverRoute
   '/compass/respond': typeof CompassRespondRoute
   '/compass': typeof CompassIndexRoute
+  '/api/tiles/$z/$x/$y': typeof ApiTilesZXYRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/compass/recover': typeof CompassRecoverRoute
   '/compass/respond': typeof CompassRespondRoute
   '/compass/': typeof CompassIndexRoute
+  '/api/tiles/$z/$x/$y': typeof ApiTilesZXYRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/compass/recover'
     | '/compass/respond'
     | '/compass/'
+    | '/api/tiles/$z/$x/$y'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/compass/recover'
     | '/compass/respond'
     | '/compass'
+    | '/api/tiles/$z/$x/$y'
   id:
     | '__root__'
     | '/'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/compass/recover'
     | '/compass/respond'
     | '/compass/'
+    | '/api/tiles/$z/$x/$y'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   ReportRoute: typeof ReportRoute
   SheltersRoutesRoute: typeof SheltersRoutesRoute
   SolutionRoute: typeof SolutionRoute
+  ApiTilesZXYRoute: typeof ApiTilesZXYRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -306,6 +319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompassPrepareRouteImport
       parentRoute: typeof CompassRoute
     }
+    '/api/tiles/$z/$x/$y': {
+      id: '/api/tiles/$z/$x/$y'
+      path: '/api/tiles/$z/$x/$y'
+      fullPath: '/api/tiles/$z/$x/$y'
+      preLoaderRoute: typeof ApiTilesZXYRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -337,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportRoute: ReportRoute,
   SheltersRoutesRoute: SheltersRoutesRoute,
   SolutionRoute: SolutionRoute,
+  ApiTilesZXYRoute: ApiTilesZXYRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
