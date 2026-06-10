@@ -281,7 +281,7 @@ export function PreparePhase() {
                   Preparedness is rehearsal that solves the evacuation before the siren.
                 </p>
                 <p className="mt-3 text-xs text-card-foreground/65">
-                  Rivera Family should be pre-matched with transport before flood risk increases.
+                  {householdLabel} should be pre-matched with transport before flood risk increases.
                 </p>
               </div>
             </div>
