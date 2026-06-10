@@ -744,7 +744,7 @@ export function SafetyLocationPanel() {
   const { activePhase } = usePhase();
   const showRiskMap = activePhase === "prepare";
 
-  const selected = locations.find((l) => l.id === selectedId) ?? MIT_LOC;
+  const selected: SavedLocation = locations.find((l) => l.id === selectedId) ?? MIT_LOC;
   const currentRoute = useMemo(
     () => selected.routes.find((r) => r.disaster === selectedDisaster) ?? selected.routes[0],
     [selected, selectedDisaster],
