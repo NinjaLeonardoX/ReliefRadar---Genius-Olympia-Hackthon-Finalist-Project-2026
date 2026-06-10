@@ -1,32 +1,6 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import {
-  CheckCircle2,
-  AlertTriangle,
-  Radar,
-  Users,
-  MapPin,
-  Building2,
-  Landmark,
-  Globe,
-  type LucideIcon,
-} from "lucide-react";
-import { HouseholdCard } from "../compass/HouseholdCard";
-
-import { VolunteerMatchCard } from "../compass/VolunteerMatchCard";
-import { usePhase } from "../PhaseContext";
-import {
-  HAZARD_RISKS,
-  PREPARE_GAPS,
-  SEVERITY_META,
-  COMMUNITY_MEMBERS,
-  TOWN_READINESS,
-  STATE_READINESS,
-  NATIONAL_READINESS,
-  getScopeMeta,
-  readinessColor,
-  type HazardRisk,
-  type RollupData,
-} from "@/data/prepare";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Radar, MapPin } from "lucide-react";
+import { HAZARD_RISKS, SEVERITY_META, type HazardRisk } from "@/data/prepare";
 import { useLocation } from "../LocationContext";
 import { RollupPanel } from "../RollupPanel";
 
