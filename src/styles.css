@@ -287,3 +287,51 @@
   85%  { opacity: 1; }
   100% { transform: translate(-50%, -50%) rotate(360deg) translateX(28px) rotate(-360deg) scale(1); opacity: 0; }
 }
+
+/* Road-style animated border for the Prepare/Respond/Recover badge */
+.road-badge {
+  isolation: isolate;
+  /* allow svg stroke to extend past the box */
+  overflow: visible;
+}
+.road-border-svg {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
+}
+.road-badge > :not(.road-border-svg) {
+  position: relative;
+  z-index: 1;
+}
+/* asphalt fill */
+.road-asphalt {
+  fill: #0b1220;
+  stroke: #1f2937;
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+}
+/* outer white solid edge line */
+.road-edge {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+/* animated dashed center lane */
+.road-lane {
+  fill: none;
+  stroke: #FACC15;
+  stroke-width: 1.5;
+  stroke-dasharray: 10 8;
+  vector-effect: non-scaling-stroke;
+  animation: road-march 1.6s linear infinite;
+  filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.7));
+}
+@keyframes road-march {
+  to { stroke-dashoffset: -36; }
+}
