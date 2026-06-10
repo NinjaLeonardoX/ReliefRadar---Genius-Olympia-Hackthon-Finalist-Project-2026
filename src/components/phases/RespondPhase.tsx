@@ -10,14 +10,24 @@ import { DisasterPicker, type DisasterKind } from "../compass/DisasterPicker";
 import { WhyThisPopover } from "../WhyThisPopover";
 import { WeatherCard } from "../WeatherCard";
 import { usePhase } from "../PhaseContext";
-import { RIVERA_HOUSEHOLD } from "@/data/seed";
+import { useHousehold } from "../LocationContext";
+import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
 
 export function RespondPhase() {
   const [disaster, setDisaster] = useState<DisasterKind>("Flood");
   const [volunteerApproved, setVolunteerApproved] = useState(false);
   const [scoresOpen, setScoresOpen] = useState(true);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const { mode } = usePhase();
   const actionRef = useRef<HTMLDivElement>(null);
+
+  // Same live-or-seed routing the /map page uses, so the polished flow shows
+  // real scores and real geometry. Flag off ⇒ seed routes (48 / 91 / 70).
+  const household = useHousehold();
+  const home: [number, number] = [household.lat, household.lng];
+  const destShelter = resolveDestinationShelter();
+  const dest: [number, number] = destShelter ? [destShelter.lat, destShelter.lng] : home;
+  const { data: routes, source: routeSource } = useRoutes(home, dest);
 
   return (
     <div className="space-y-6">
@@ -48,7 +58,12 @@ export function RespondPhase() {
           <ActionCard ref={actionRef} disaster={disaster} volunteerApproved={volunteerApproved} />
         </div>
         <div className="lg:col-span-2">
-          <MapPanel disaster={disaster} />
+          <MapPanel
+            disaster={disaster}
+            routes={routes}
+            selectedRouteId={selectedRouteId}
+            onSelectRoute={setSelectedRouteId}
+          />
         </div>
       </div>
 
@@ -77,7 +92,12 @@ export function RespondPhase() {
               </div>
               {scoresOpen && (
                 <div className="border-t border-border/60">
-                  <RouteScorePanel />
+                  <RouteScorePanel
+                    routes={routes}
+                    source={routeSource}
+                    selectedRouteId={selectedRouteId}
+                    onSelectRoute={setSelectedRouteId}
+                  />
                 </div>
               )}
               <p className="border-t border-border/60 px-5 py-2 text-[11px] italic text-card-foreground/60">
@@ -92,7 +112,7 @@ export function RespondPhase() {
         </div>
 
         <div className="space-y-6">
-          <WeatherCard lat={RIVERA_HOUSEHOLD.lat} lng={RIVERA_HOUSEHOLD.lng} />
+          <WeatherCard lat={household.lat} lng={household.lng} />
           <HouseholdCard />
           {disaster === "Flood" && (
             <div className="space-y-2">
