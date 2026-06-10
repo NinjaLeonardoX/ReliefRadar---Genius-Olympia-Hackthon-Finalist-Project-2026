@@ -67,7 +67,23 @@ export interface RouteOption {
    * coordinates[i] and coordinates[i+1]). Powers turn-by-turn navigation cues.
    */
   streets?: string[];
+  /**
+   * Turn-by-turn navigation steps, in order, when a live routing provider
+   * supplies them. Each entry is one maneuver.
+   */
+  steps?: RouteStep[];
   notes: string;
+}
+
+export interface RouteStep {
+  /** Human-readable instruction, e.g. "Turn right onto Main St". */
+  instruction: string;
+  /** Street name for this step (if known). */
+  name?: string;
+  /** Distance for this step in miles. */
+  distanceMiles: number;
+  /** Estimated time for this step in minutes. */
+  durationMinutes: number;
 }
 
 export interface BlockedRoad {
