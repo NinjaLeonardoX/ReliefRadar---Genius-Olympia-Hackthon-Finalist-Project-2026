@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Compass,
   AlertTriangle,
@@ -13,8 +13,29 @@ import {
   ClipboardList,
   Sparkles,
   Clock,
+  Droplet,
+  Utensils,
+  Pill,
+  BedDouble,
+  BatteryCharging,
+  Car,
+  Sparkle,
+  Stethoscope,
+  Shirt,
+  Wrench,
+  Wifi,
+  Baby,
+  Accessibility,
+  HeartPulse,
+  PawPrint,
+  Users,
+  LocateFixed,
+  Truck,
+  Hammer,
+  type LucideIcon,
 } from "lucide-react";
 import { useLocation } from "../LocationContext";
+
 
 type Status = "Open" | "Matched" | "In Progress" | "Completed";
 
@@ -221,6 +242,7 @@ export function RecoverPhase() {
       {/* Forms */}
       {openForm === "need" && (
         <NeedForm
+          detectedLocation={scopeLabel}
           onClose={() => setOpenForm(null)}
           onSubmit={(n) => {
             setNeeds((prev) => [{ ...n, id: `n${Date.now()}`, status: "Open" }, ...prev]);
@@ -230,6 +252,7 @@ export function RecoverPhase() {
       )}
       {openForm === "help" && (
         <HelpForm
+          detectedLocation={scopeLabel}
           onClose={() => setOpenForm(null)}
           onSubmit={(h) => {
             setHelpers((prev) => [{ ...h, id: `h${Date.now()}` }, ...prev]);
@@ -237,6 +260,7 @@ export function RecoverPhase() {
           }}
         />
       )}
+
 
       {/* Compass visual */}
       <div id="compass" className="dc-card dc-elev-hero p-6">
@@ -523,65 +547,304 @@ function Field({
 const inputCls =
   "w-full rounded-lg border border-card-foreground/15 bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-[color:var(--severity-moderate)] focus:ring-2 focus:ring-[color:var(--severity-moderate)]/20";
 
+// ── Icon picker data ────────────────────────────────────────────────────────
+
+type Category = { id: string; label: string; Icon: LucideIcon };
+
+const NEED_CATEGORIES: Category[] = [
+  { id: "water", label: "Drinking water", Icon: Droplet },
+  { id: "food", label: "Hot meal / food", Icon: Utensils },
+  { id: "medicine", label: "Medicine / Rx", Icon: Pill },
+  { id: "shelter", label: "Place to stay", Icon: BedDouble },
+  { id: "power", label: "Power / charging", Icon: BatteryCharging },
+  { id: "ride", label: "Ride / transport", Icon: Car },
+  { id: "cleanup", label: "Cleanup help", Icon: Sparkle },
+  { id: "wellness", label: "Wellness check", Icon: Stethoscope },
+  { id: "clothes", label: "Clothes / blankets", Icon: Shirt },
+  { id: "repair", label: "Home repair", Icon: Wrench },
+  { id: "wifi", label: "Internet / WiFi", Icon: Wifi },
+  { id: "petcare", label: "Pet care", Icon: PawPrint },
+];
+
+const HELP_CATEGORIES: Category[] = [
+  { id: "water", label: "Bottled water", Icon: Droplet },
+  { id: "food", label: "Cooked food", Icon: Utensils },
+  { id: "medicine", label: "Pharmacy run", Icon: Pill },
+  { id: "shelter", label: "Spare room / bed", Icon: BedDouble },
+  { id: "power", label: "Charging / generator", Icon: BatteryCharging },
+  { id: "ride", label: "Ride / pickup", Icon: Car },
+  { id: "truck", label: "Truck + crew", Icon: Truck },
+  { id: "cleanup", label: "Cleanup crew", Icon: Sparkle },
+  { id: "tools", label: "Tools / repairs", Icon: Hammer },
+  { id: "wifi", label: "WiFi hotspot", Icon: Wifi },
+  { id: "wellness", label: "Wellness checks", Icon: HeartPulse },
+  { id: "petcare", label: "Pet care", Icon: PawPrint },
+];
+
+type UrgencyOpt = { value: Need["urgency"]; label: string; Icon: LucideIcon; tone: string };
+const URGENCY_OPTS: UrgencyOpt[] = [
+  { value: "Urgent", label: "Urgent", Icon: AlertTriangle, tone: "var(--severity-high)" },
+  { value: "Soon", label: "Soon", Icon: Clock, tone: "var(--severity-moderate)" },
+  { value: "Whenever", label: "Whenever", Icon: CheckCircle2, tone: "var(--severity-low)" },
+];
+
+type AvailabilityOpt = { value: string; label: string; Icon: LucideIcon };
+const AVAILABILITY_OPTS: AvailabilityOpt[] = [
+  { value: "Now", label: "Right now", Icon: Sparkles },
+  { value: "Today", label: "Today", Icon: Clock },
+  { value: "Tonight", label: "Tonight", Icon: BedDouble },
+  { value: "Tomorrow", label: "Tomorrow", Icon: ArrowRight },
+  { value: "This week", label: "This week", Icon: CheckCircle2 },
+];
+
+type VulnerabilityTag = { id: string; label: string; Icon: LucideIcon };
+const VULNERABILITY_TAGS: VulnerabilityTag[] = [
+  { id: "infant", label: "Infant / kids", Icon: Baby },
+  { id: "elderly", label: "Elderly", Icon: Users },
+  { id: "medical", label: "Medical need", Icon: HeartPulse },
+  { id: "accessibility", label: "Accessibility", Icon: Accessibility },
+  { id: "no-transport", label: "No transport", Icon: Car },
+  { id: "pets", label: "Pets", Icon: PawPrint },
+];
+
+// ── Reusable icon-grid picker ───────────────────────────────────────────────
+
+function IconGrid<T extends { id?: string; value?: string; label: string; Icon: LucideIcon; tone?: string }>({
+  options,
+  selectedKey,
+  onSelect,
+  cols = "grid-cols-3 sm:grid-cols-4",
+  accent = "var(--severity-moderate)",
+}: {
+  options: T[];
+  selectedKey: string | null;
+  onSelect: (key: string) => void;
+  cols?: string;
+  accent?: string;
+}) {
+  return (
+    <div className={`grid gap-2 ${cols}`}>
+      {options.map((opt) => {
+        const key = (opt.id ?? opt.value) as string;
+        const selected = selectedKey === key;
+        const tone = opt.tone ?? accent;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onSelect(key)}
+            className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center text-xs font-medium transition ${
+              selected
+                ? "border-transparent shadow-sm"
+                : "border-card-foreground/15 bg-background hover:bg-card-foreground/5"
+            }`}
+            style={
+              selected
+                ? {
+                    background: `color-mix(in oklab, ${tone} 14%, transparent)`,
+                    color: tone,
+                    boxShadow: `0 0 0 2px color-mix(in oklab, ${tone} 50%, transparent)`,
+                  }
+                : undefined
+            }
+          >
+            <opt.Icon className="h-5 w-5" />
+            <span className="leading-tight">{opt.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function MultiIconGrid({
+  options,
+  selectedIds,
+  onToggle,
+}: {
+  options: VulnerabilityTag[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      {options.map((opt) => {
+        const selected = selectedIds.includes(opt.id);
+        return (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => onToggle(opt.id)}
+            className={`flex flex-col items-center gap-1 rounded-xl border p-2.5 text-center text-[11px] font-medium transition ${
+              selected
+                ? "border-[color:var(--severity-moderate)] bg-[color:var(--severity-moderate)]/15 text-[color:var(--severity-moderate)]"
+                : "border-card-foreground/15 bg-background text-card-foreground/80 hover:bg-card-foreground/5"
+            }`}
+          >
+            <opt.Icon className="h-4 w-4" />
+            <span className="leading-tight">{opt.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Location bar (auto-detect with override) ────────────────────────────────
+
+function LocationBar({
+  value,
+  detected,
+  onChange,
+}: {
+  value: string;
+  detected: string;
+  onChange: (v: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  return (
+    <div className="rounded-xl border border-card-foreground/15 bg-background p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="inline-flex items-center gap-2 text-xs">
+          <LocateFixed className="h-4 w-4 text-[color:var(--severity-low)]" />
+          <span className="font-semibold text-card-foreground/80">Location detected:</span>
+          <span className="font-semibold text-foreground">{value || detected || "Locating…"}</span>
+        </div>
+        {!editing && (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="text-[11px] font-semibold text-[color:var(--severity-moderate)] hover:underline"
+          >
+            Change
+          </button>
+        )}
+      </div>
+      {editing && (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <input
+            autoFocus
+            className={inputCls + " flex-1"}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            maxLength={120}
+            placeholder="e.g. Maple St & 4th"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              onChange(detected);
+              setEditing(false);
+            }}
+            className="rounded-full border border-card-foreground/15 px-3 py-1.5 text-[11px] font-semibold text-card-foreground/75 hover:bg-card-foreground/5"
+          >
+            Use detected
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+            className="rounded-full bg-[color:var(--severity-moderate)] px-3 py-1.5 text-[11px] font-semibold text-white hover:brightness-110"
+          >
+            Done
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Forms ───────────────────────────────────────────────────────────────────
+
 function NeedForm({
+  detectedLocation,
   onClose,
   onSubmit,
 }: {
+  detectedLocation: string;
   onClose: () => void;
   onSubmit: (n: Omit<Need, "id" | "status">) => void;
 }) {
-  const [what, setWhat] = useState("");
-  const [where, setWhere] = useState("");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [urgency, setUrgency] = useState<Need["urgency"]>("Urgent");
-  const [when, setWhen] = useState("");
-  const [vuln, setVuln] = useState("");
+  const [vulnIds, setVulnIds] = useState<string[]>([]);
+  const [where, setWhere] = useState(detectedLocation);
+
+  useEffect(() => {
+    if (detectedLocation && !where) setWhere(detectedLocation);
+  }, [detectedLocation, where]);
+
+  const category = NEED_CATEGORIES.find((c) => c.id === categoryId);
+  const canSubmit = !!category && !!where.trim();
 
   return (
     <form
-      className="dc-card space-y-3 p-5"
+      className="dc-card space-y-4 p-5"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!what.trim() || !where.trim()) return;
+        if (!canSubmit || !category) return;
+        const vulnLabel = vulnIds
+          .map((id) => VULNERABILITY_TAGS.find((v) => v.id === id)?.label)
+          .filter(Boolean)
+          .join(", ");
         onSubmit({
-          what: what.trim().slice(0, 120),
+          what: category.label,
           where: where.trim().slice(0, 120),
           urgency,
-          vulnerable: vuln.trim().slice(0, 120) || undefined,
+          vulnerable: vulnLabel || undefined,
         });
       }}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold uppercase tracking-wider">I Need Help</h3>
+        <div className="inline-flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-[color:var(--severity-high)]" />
+          <h3 className="text-sm font-bold uppercase tracking-wider">I Need Help</h3>
+        </div>
         <button type="button" onClick={onClose} className="text-xs text-card-foreground/60 hover:text-foreground">
           Cancel
         </button>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <Field label="What do you need?">
-          <input className={inputCls} value={what} onChange={(e) => setWhat(e.target.value)} maxLength={120} placeholder="e.g. drinking water" />
-        </Field>
-        <Field label="Where / nearest landmark">
-          <input className={inputCls} value={where} onChange={(e) => setWhere(e.target.value)} maxLength={120} placeholder="e.g. Maple St & 4th" />
-        </Field>
-        <Field label="How urgent?">
-          <select className={inputCls} value={urgency} onChange={(e) => setUrgency(e.target.value as Need["urgency"])}>
-            <option>Urgent</option>
-            <option>Soon</option>
-            <option>Whenever</option>
-          </select>
-        </Field>
-        <Field label="When do you need it?">
-          <input className={inputCls} value={when} onChange={(e) => setWhen(e.target.value)} maxLength={60} placeholder="e.g. within 2 hours" />
-        </Field>
-        <div className="md:col-span-2">
-          <Field label="Are you elderly, disabled, without transport, or have a medical need? (optional)">
-            <input className={inputCls} value={vuln} onChange={(e) => setVuln(e.target.value)} maxLength={120} placeholder="e.g. elderly, no transport" />
-          </Field>
-        </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          What do you need?
+        </p>
+        <IconGrid options={NEED_CATEGORIES} selectedKey={categoryId} onSelect={setCategoryId} accent="var(--severity-high)" />
       </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          How urgent?
+        </p>
+        <IconGrid
+          options={URGENCY_OPTS}
+          selectedKey={urgency}
+          onSelect={(v) => setUrgency(v as Need["urgency"])}
+          cols="grid-cols-3"
+        />
+      </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          Anyone vulnerable in your household? <span className="font-normal text-card-foreground/55">(tap any)</span>
+        </p>
+        <MultiIconGrid
+          options={VULNERABILITY_TAGS}
+          selectedIds={vulnIds}
+          onToggle={(id) => setVulnIds((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))}
+        />
+      </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          Where?
+        </p>
+        <LocationBar value={where} detected={detectedLocation} onChange={setWhere} />
+      </div>
+
       <button
         type="submit"
-        className="inline-flex items-center gap-2 rounded-full bg-[color:var(--severity-high)] px-5 py-2 text-sm font-semibold text-white hover:brightness-110"
+        disabled={!canSubmit}
+        className="inline-flex items-center gap-2 rounded-full bg-[color:var(--severity-high)] px-5 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50"
       >
         Post Need Beacon <ArrowRight className="h-4 w-4" />
       </button>
@@ -590,57 +853,85 @@ function NeedForm({
 }
 
 function HelpForm({
+  detectedLocation,
   onClose,
   onSubmit,
 }: {
+  detectedLocation: string;
   onClose: () => void;
   onSubmit: (h: Omit<HelpPoint, "id">) => void;
 }) {
-  const [offer, setOffer] = useState("");
-  const [where, setWhere] = useState("");
-  const [available, setAvailable] = useState("");
-  const [distance, setDistance] = useState("");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [available, setAvailable] = useState<string>("Now");
+  const [where, setWhere] = useState(detectedLocation);
+
+  useEffect(() => {
+    if (detectedLocation && !where) setWhere(detectedLocation);
+  }, [detectedLocation, where]);
+
+  const category = HELP_CATEGORIES.find((c) => c.id === categoryId);
+  const availability = AVAILABILITY_OPTS.find((a) => a.value === available);
+  const canSubmit = !!category && !!where.trim();
 
   return (
     <form
-      className="dc-card space-y-3 p-5"
+      className="dc-card space-y-4 p-5"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!offer.trim() || !where.trim()) return;
+        if (!canSubmit || !category) return;
         onSubmit({
-          offer: offer.trim().slice(0, 120),
+          offer: category.label,
           where: where.trim().slice(0, 120),
-          available: available.trim().slice(0, 60) || "Flexible",
-          distance: distance.trim().slice(0, 40) || "Nearby",
+          available: availability?.label ?? "Flexible",
+          distance: "Nearby",
         });
       }}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold uppercase tracking-wider">I Can Help</h3>
+        <div className="inline-flex items-center gap-2">
+          <HandHeart className="h-4 w-4 text-[color:var(--severity-low)]" />
+          <h3 className="text-sm font-bold uppercase tracking-wider">I Can Help</h3>
+        </div>
         <button type="button" onClick={onClose} className="text-xs text-card-foreground/60 hover:text-foreground">
           Cancel
         </button>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <Field label="What can you offer?">
-          <input className={inputCls} value={offer} onChange={(e) => setOffer(e.target.value)} maxLength={120} placeholder="e.g. bottled water, ride, spare room" />
-        </Field>
-        <Field label="Where are you located?">
-          <input className={inputCls} value={where} onChange={(e) => setWhere(e.target.value)} maxLength={120} placeholder="e.g. Cedar Lane" />
-        </Field>
-        <Field label="When are you available?">
-          <input className={inputCls} value={available} onChange={(e) => setAvailable(e.target.value)} maxLength={60} placeholder="e.g. tonight, weekends" />
-        </Field>
-        <Field label="How far can you travel?">
-          <input className={inputCls} value={distance} onChange={(e) => setDistance(e.target.value)} maxLength={40} placeholder="e.g. 5 miles" />
-        </Field>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          What can you offer?
+        </p>
+        <IconGrid options={HELP_CATEGORIES} selectedKey={categoryId} onSelect={setCategoryId} accent="var(--severity-low)" />
       </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          When are you available?
+        </p>
+        <IconGrid
+          options={AVAILABILITY_OPTS}
+          selectedKey={available}
+          onSelect={setAvailable}
+          cols="grid-cols-3 sm:grid-cols-5"
+          accent="var(--severity-low)"
+        />
+      </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          Where are you?
+        </p>
+        <LocationBar value={where} detected={detectedLocation} onChange={setWhere} />
+      </div>
+
       <button
         type="submit"
-        className="inline-flex items-center gap-2 rounded-full bg-[color:var(--severity-low)] px-5 py-2 text-sm font-semibold text-white hover:brightness-110"
+        disabled={!canSubmit}
+        className="inline-flex items-center gap-2 rounded-full bg-[color:var(--severity-low)] px-5 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50"
       >
         Add Help Point <ArrowRight className="h-4 w-4" />
       </button>
     </form>
   );
 }
+
