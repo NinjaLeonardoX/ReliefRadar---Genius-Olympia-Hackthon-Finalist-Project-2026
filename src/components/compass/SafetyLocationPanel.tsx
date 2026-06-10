@@ -444,8 +444,8 @@ type SetupMode = null | "device" | "manual";
 type SetupStep = "name" | "wizard" | "review" | "generated";
 
 export function SafetyLocationPanel() {
-  const [locations, setLocations] = useState<SavedLocation[]>([SJFU]);
-  const [selectedId, setSelectedId] = useState<string>(SJFU.id);
+  const [locations, setLocations] = useState<SavedLocation[]>([MY_ADDRESS, SJFU]);
+  const [selectedId, setSelectedId] = useState<string>(MY_ADDRESS.id);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Setup flow state
