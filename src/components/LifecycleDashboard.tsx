@@ -121,6 +121,26 @@ export function LifecycleDashboard() {
 /** The rollup-scale lens (Household → National), in the page content (not the nav). */
 function ScopeSelector() {
   const { scope, setScope } = usePhase();
+  const { activeAddress, resolved, source } = useLocation();
+
+  const placeFor = (id: ReadinessScope, fallback: string): string => {
+    if (source === "seed") return fallback;
+    switch (id) {
+      case "household":
+        return activeAddress?.name ?? "Your household";
+      case "community":
+        return resolved?.city
+          ? `near ${resolved.city}`
+          : "your area";
+      case "town":
+        return resolved?.city ?? resolved?.county ?? fallback;
+      case "state":
+        return resolved?.state ?? resolved?.stateCode ?? fallback;
+      case "national":
+        return resolved?.country ?? fallback;
+    }
+  };
+
   return (
     <div
       role="tablist"
@@ -129,6 +149,7 @@ function ScopeSelector() {
     >
       {SCOPE_META.map((s) => {
         const active = scope === s.id;
+        const place = placeFor(s.id, s.place);
         return (
           <button
             key={s.id}
@@ -146,7 +167,7 @@ function ScopeSelector() {
             <span
               className={`block text-[10px] leading-tight ${active ? "text-white/75" : "text-card-foreground/50"}`}
             >
-              {s.place}
+              {place}
             </span>
           </button>
         );
@@ -154,6 +175,7 @@ function ScopeSelector() {
     </div>
   );
 }
+
 
 interface SnapshotSummary {
   ring: number;
