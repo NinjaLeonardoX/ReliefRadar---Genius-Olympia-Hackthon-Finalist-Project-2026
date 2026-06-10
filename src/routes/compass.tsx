@@ -38,7 +38,7 @@ function CompassPage() {
 
             <div className="border-t border-border/60 pt-8">
               {activePhase === "prepare" && <PreparePhase />}
-              {activePhase === "respond" && <RespondPhase />}
+              {activePhase === "respond" && <RespondQuickAction />}
               {activePhase === "recover" && <RecoverPhase />}
             </div>
 
