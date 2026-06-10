@@ -292,7 +292,7 @@ export function PreparePhase() {
 
         {scope === "town" && (
           <RollupStatsPanel
-            title="North Creek · town-wide"
+            title={`${townLabel} · town-wide`}
             Icon={Building2}
             ringLabel="Town readiness"
             data={TOWN_READINESS}
