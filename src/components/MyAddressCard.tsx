@@ -64,7 +64,7 @@ export function MyAddressCard() {
 
   // Once device location resolves, open the "Save as household" prompt.
   const showDeviceModal =
-    pendingDevice && source === "device" && resolved != null && status === "ready";
+    pendingDevice && source === "device" && resolved != null;
 
   async function saveDeviceAsHousehold() {
     if (!resolved) return;
