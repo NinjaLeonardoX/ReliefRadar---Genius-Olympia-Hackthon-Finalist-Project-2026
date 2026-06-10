@@ -33,6 +33,7 @@ export function MapPanel({
   locationAware = false,
 }: Props) {
   const [mounted, setMounted] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const [secsAgo, setSecsAgo] = useState(0);
