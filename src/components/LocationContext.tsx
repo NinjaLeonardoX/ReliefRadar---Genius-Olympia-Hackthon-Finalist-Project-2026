@@ -48,6 +48,7 @@ const LocationContext = createContext<LocationContextValue | null>(null);
 function householdFromSaved(addr: SavedAddress): Household {
   return {
     ...RIVERA_HOUSEHOLD,
+    name: addr.name,
     locationName: addr.name,
     lat: addr.lat,
     lng: addr.lng,
