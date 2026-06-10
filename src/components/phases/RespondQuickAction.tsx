@@ -91,9 +91,9 @@ export function RespondQuickAction() {
   const home: [number, number] = [household.lat, household.lng];
 
   // Location-aware evacuation: synthesize safe destinations near the real
-  // origin and route via ORS (or honest straight-line fallback). Always yields
+  // location and route via ORS (or honest straight-line fallback). Always yields
   // a line, regardless of how far the user is from the seed scenario.
-  const { routes, destinations } = useEvacuationRoutes(home, "flood", true);
+  const { routes, destinations } = useEvacuationRoutes(home, "flood", true, refreshTick);
 
   // Active alert event from NWS for the user's location. Defaults to
   // "Heat Wave" when no alert is active or the fetch fails.
