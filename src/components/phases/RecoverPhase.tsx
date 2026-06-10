@@ -176,6 +176,8 @@ export function RecoverPhase() {
   const [helpers, setHelpers] = useState<HelpPoint[]>(SEED_HELP);
   const [openForm, setOpenForm] = useState<null | "need" | "help" | "broadcast">(null);
   const [draftNeed, setDraftNeed] = useState<Omit<Need, "id" | "status"> | null>(null);
+  const [sending, setSending] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const householdLabel = activeAddress?.name ?? "Your household";
   const scopeLabel = resolved?.city
@@ -186,8 +188,70 @@ export function RecoverPhase() {
   const matchedCount = needs.filter((n) => n.status === "Matched" || n.status === "In Progress").length;
   const completedCount = needs.filter((n) => n.status === "Completed").length;
 
+  async function postBeacon(channels: BroadcastChannel[]) {
+    if (!draftNeed) return;
+    setSending(true);
+    setToast(`Sending to ${channels.length} channel${channels.length === 1 ? "" : "s"}…`);
+    try {
+      // Mirror into IQ Engine state (localStorage) so the IQ broadcast log + beacons see it.
+      const id = `n${Date.now()}`;
+      const now = Date.now();
+
+      // 1. Add to IQ beacons list
+      try {
+        const rawB = window.localStorage.getItem("iq:beacons");
+        const list = rawB ? JSON.parse(rawB) : [];
+        const iqBeacon = {
+          id,
+          what: draftNeed.what,
+          where: draftNeed.where || scopeLabel,
+          urgency: draftNeed.urgency,
+          status: "Open",
+          createdAt: now,
+        };
+        window.localStorage.setItem("iq:beacons", JSON.stringify([iqBeacon, ...list]));
+      } catch {/* ignore */}
+
+      // 2. Log to IQ broadcast log
+      try {
+        const rawL = window.localStorage.getItem("iq:broadcasts");
+        const log = rawL ? JSON.parse(rawL) : [];
+        const entry = {
+          id: `bc${now}`,
+          origin: scopeLabel || "Recover phase",
+          destination: `${draftNeed.what}${draftNeed.where ? ` · ${draftNeed.where}` : ""}`,
+          rule: `Need Beacon · ${draftNeed.urgency}`,
+          score: draftNeed.urgency === "Urgent" ? 95 : draftNeed.urgency === "Soon" ? 75 : 55,
+          sentAt: now,
+          recipients: channels.length,
+        };
+        window.localStorage.setItem("iq:broadcasts", JSON.stringify([entry, ...log].slice(0, 20)));
+      } catch {/* ignore */}
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      setNeeds((prev) => [
+        { ...draftNeed, id, status: "Posted", channels },
+        ...prev,
+      ]);
+      setToast(`Posted to ${channels.length} channel${channels.length === 1 ? "" : "s"}. Logged in IQ Engine.`);
+      setTimeout(() => setToast(null), 3500);
+    } finally {
+      setSending(false);
+      setDraftNeed(null);
+      setOpenForm(null);
+    }
+  }
+
+
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className="flex items-center gap-2 rounded-xl border border-[color:var(--severity-moderate)]/40 bg-[color:var(--severity-moderate)]/10 px-4 py-2.5 text-sm font-semibold text-foreground">
+          <Radio className={`h-4 w-4 text-[color:var(--severity-moderate)] ${sending ? "animate-pulse" : ""}`} />
+          {toast}
+        </div>
+      )}
       {/* Header */}
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--severity-low)]">
@@ -274,18 +338,13 @@ export function RecoverPhase() {
       {openForm === "broadcast" && draftNeed && (
         <BroadcastBeacon
           draft={draftNeed}
+          sending={sending}
           onCancel={() => {
+            if (sending) return;
             setDraftNeed(null);
             setOpenForm(null);
           }}
-          onPost={(channels) => {
-            setNeeds((prev) => [
-              { ...draftNeed, id: `n${Date.now()}`, status: "Posted", channels },
-              ...prev,
-            ]);
-            setDraftNeed(null);
-            setOpenForm(null);
-          }}
+          onPost={postBeacon}
         />
       )}
       {openForm === "help" && (
@@ -1000,10 +1059,12 @@ function redactForPublic(text: string): string {
 
 function BroadcastBeacon({
   draft,
+  sending,
   onCancel,
   onPost,
 }: {
   draft: Omit<Need, "id" | "status">;
+  sending: boolean;
   onCancel: () => void;
   onPost: (channels: BroadcastChannel[]) => void;
 }) {
@@ -1125,12 +1186,12 @@ function BroadcastBeacon({
         </button>
         <button
           type="button"
-          disabled={selected.length === 0}
+          disabled={selected.length === 0 || sending}
           onClick={() => onPost(selected)}
           className="inline-flex items-center gap-2 rounded-full bg-[color:var(--severity-high)] px-5 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50"
         >
-          <Megaphone className="h-4 w-4" />
-          Post Beacon
+          <Megaphone className={`h-4 w-4 ${sending ? "animate-pulse" : ""}`} />
+          {sending ? "Sending to beacon…" : "Post Beacon"}
         </button>
       </div>
     </div>
