@@ -158,11 +158,14 @@ const slides: Slide[] = [
     aiTools: [
       { name: "ChatGPT", use: "Ideation, copywriting, and research" },
       { name: "Claude (Claude Code)", use: "Code generation and implementation" },
-      { name: "Lovable", use: "Full-stack app scaffolding and hosting" },
+      {
+        name: "Lovable",
+        use: "Full-stack scaffolding, hosting & in-app AI gateway — Google Gemini 3 Flash",
+      },
       { name: "Gamma", use: "Presentation design support" },
       { name: "FlowScholar", use: "Task management and strategy" },
     ],
-    note: "AI accelerated the build, but the rules engine stays deterministic and human-reviewed. In-app, location plans use Google Gemini 3 Flash via the Lovable AI Gateway.",
+    note: "AI accelerated the build, but the rules engine stays deterministic and human-reviewed — AI explains, rules decide, humans approve.",
   },
   // 6 — Demo
   {
