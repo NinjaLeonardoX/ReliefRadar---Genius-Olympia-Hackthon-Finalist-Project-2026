@@ -199,7 +199,7 @@ function PrepareSnapshot() {
     community: {
       ring: communityAvg,
       headline: `${readyCount} of 5 ready`,
-      callout: `⚠ ${COMMUNITY_MEMBERS.length - readyCount} households need support — top: Rivera (no ride).`,
+      callout: `⚠ ${COMMUNITY_MEMBERS.length - readyCount} households need support — top gap: no ride arranged.`,
       warn: true,
     },
     town: {
