@@ -866,7 +866,7 @@ ${planBlocks}
           <div className="mb-4">
             <h3 className="text-xl font-bold tracking-tight">{selected.name}</h3>
             <p className="mt-1 text-sm text-card-foreground/75">
-              Your Compass Plan is ready. Review routes, fix gaps, or print the guide.
+              {getTypeCopy(selected.type).planIntro}
             </p>
           </div>
         ) : (
