@@ -52,9 +52,8 @@ export function MyAddressCard() {
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Modal that prompts the user to save device-detected location as a household.
+  // Auto-save device-detected location as the active household (no prompt).
   const [pendingDevice, setPendingDevice] = useState(false);
-  const [householdName, setHouseholdName] = useState("Home");
   const [savingHousehold, setSavingHousehold] = useState(false);
 
   function handleRequestLocation() {
@@ -62,44 +61,50 @@ export function MyAddressCard() {
     requestLocation();
   }
 
-  // Once device location resolves, open the "Save as household" prompt.
-  const showDeviceModal =
-    pendingDevice && source === "device" && resolved != null;
-
-  async function saveDeviceAsHousehold() {
-    if (!resolved) return;
-    const trimmed = householdName.trim();
-    if (!trimmed) return;
-    setSavingHousehold(true);
-    try {
-      const saved: SavedAddress = {
-        id: makeId(),
-        name: trimmed.slice(0, 60),
-        address: resolved.displayName ?? `${resolved.lat.toFixed(5)}, ${resolved.lng.toFixed(5)}`,
-        lat: resolved.lat,
-        lng: resolved.lng,
-        displayName: resolved.displayName,
-        city: resolved.city,
-        county: resolved.county,
-        state: resolved.state,
-        stateCode: resolved.stateCode,
-        country: resolved.country,
-        countryCode: resolved.countryCode,
-        savedAt: new Date().toISOString(),
-      };
-      await upsertAddress(saved);
-      selectAddress(saved.id);
-      refreshAddresses();
-      const list = await listAddresses();
-      setAddresses(list);
-      toast.success(`Saved "${saved.name}" as your household`);
-      setPendingDevice(false);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to save");
-    } finally {
-      setSavingHousehold(false);
-    }
-  }
+  // Once device location resolves, auto-upsert it as the active household.
+  useEffect(() => {
+    if (!pendingDevice || source !== "device" || !resolved || savingHousehold) return;
+    let cancelled = false;
+    (async () => {
+      setSavingHousehold(true);
+      try {
+        const existing = activeAddress;
+        const saved: SavedAddress = {
+          id: existing?.id ?? makeId(),
+          name: existing?.name ?? "My Location",
+          address: resolved.displayName ?? `${resolved.lat.toFixed(5)}, ${resolved.lng.toFixed(5)}`,
+          lat: resolved.lat,
+          lng: resolved.lng,
+          displayName: resolved.displayName,
+          city: resolved.city,
+          county: resolved.county,
+          state: resolved.state,
+          stateCode: resolved.stateCode,
+          country: resolved.country,
+          countryCode: resolved.countryCode,
+          savedAt: new Date().toISOString(),
+        };
+        await upsertAddress(saved);
+        if (cancelled) return;
+        selectAddress(saved.id);
+        refreshAddresses();
+        const list = await listAddresses();
+        if (!cancelled) setAddresses(list);
+        toast.success(`Saved location as "${saved.name}"`);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Failed to save");
+      } finally {
+        if (!cancelled) {
+          setSavingHousehold(false);
+          setPendingDevice(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingDevice, source, resolved?.lat, resolved?.lng]);
 
   useEffect(() => {
     let cancelled = false;
