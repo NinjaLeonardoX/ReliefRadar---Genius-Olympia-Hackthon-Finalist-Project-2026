@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { HouseholdCard } from "../compass/HouseholdCard";
 import { VolunteerMatchCard } from "../compass/VolunteerMatchCard";
+import { usePhase } from "../PhaseContext";
 import {
   HAZARD_RISKS,
   PREPARE_GAPS,
@@ -34,10 +35,25 @@ import { ROUTES, RIVERA_HOUSEHOLD } from "@/data/seed";
 const PrepareRiskMap = lazy(() => import("../compass/PrepareRiskMap"));
 
 export function PreparePhase() {
+  // The sidebar Resident/Community toggle and these scope tabs are the same
+  // axis (personal vs collective), so keep them in sync: Resident ↔ My Family,
+  // Community ↔ My Community / My Town.
+  const { mode, setMode } = usePhase();
   const [selectedId, setSelectedId] = useState<string>("flood");
-  const [scope, setScope] = useState<ReadinessScope>("family");
+  const [scope, setScope] = useState<ReadinessScope>(mode === "community" ? "community" : "family");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Follow the global mode when it changes elsewhere (e.g. the sidebar toggle).
+  useEffect(() => {
+    setScope((prev) => (mode === "resident" ? "family" : prev === "family" ? "community" : prev));
+  }, [mode]);
+
+  // Selecting a tab also drives the shared mode so the sidebar never disagrees.
+  function selectScope(next: ReadinessScope) {
+    setScope(next);
+    setMode(next === "family" ? "resident" : "community");
+  }
 
   // Readiness gaps — seed pre-closed items so the demo opens at 60%.
   const [closed, setClosed] = useState<Set<string>>(
@@ -156,7 +172,7 @@ export function PreparePhase() {
               {scopeMeta.blurb}
             </p>
           </div>
-          <ScopeTabs value={scope} onChange={setScope} />
+          <ScopeTabs value={scope} onChange={selectScope} />
         </div>
 
         {scope === "family" && (
