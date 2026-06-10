@@ -6,7 +6,26 @@ import { useLocation } from "../LocationContext";
 import { useEvacuationRoutes } from "@/lib/queries/evacuation";
 import { fetchAlertsByPoint } from "@/lib/nwsAlerts";
 import { readSOSRecipient, formatSOSMessage } from "@/routes/iq";
-import type { RouteOption } from "@/types";
+import type { DisasterType, RouteOption } from "@/types";
+
+/** Map an NWS event string (e.g. "Heat Advisory") to our DisasterType. */
+function eventToDisaster(event: string): DisasterType {
+  const e = event.toLowerCase();
+  if (e.includes("heat")) return "heat";
+  if (e.includes("flood")) return "flood";
+  if (e.includes("hurricane") || e.includes("tropical")) return "hurricane";
+  if (e.includes("fire") || e.includes("red flag") || e.includes("smoke")) return "wildfire";
+  if (e.includes("earthquake") || e.includes("tsunami")) return "earthquake";
+  return "heat";
+}
+
+const DISASTER_LABEL: Record<DisasterType, string> = {
+  heat: "cooling center",
+  flood: "higher ground",
+  hurricane: "inland assembly point",
+  wildfire: "safe area away from fire",
+  earthquake: "open assembly area",
+};
 
 const ROUTE_CACHE_KEY = "dc.respond.lastRoute.v1";
 const LOC_CACHE_KEY = "dc.respond.lastLocation.v1";
