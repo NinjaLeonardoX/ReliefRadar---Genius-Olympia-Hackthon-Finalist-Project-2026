@@ -1251,6 +1251,7 @@ function NameStep(p: SetupModalProps) {
         >
           {LOCATION_TYPES.map((t) => <option key={t}>{t}</option>)}
         </select>
+        <span className="mt-1 text-xs text-black/70">{getTypeCopy(p.draftType).baseIntro}</span>
       </label>
 
       <div className="flex justify-end gap-2 pt-2">
