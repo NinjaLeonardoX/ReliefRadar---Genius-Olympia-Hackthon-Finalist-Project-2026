@@ -293,7 +293,7 @@ export function RespondQuickAction() {
 
       {/* Map */}
       <MapPanel
-        disaster="Flood"
+        disaster={disasterToKind(disasterType)}
         routes={routes}
         selectedRouteId={selectedRouteId}
         onSelectRoute={setSelectedRouteId}
@@ -314,6 +314,9 @@ export function RespondQuickAction() {
           <div className="flex items-center gap-2">
             <Navigation className="h-4 w-4 text-[color:var(--severity-low)]" aria-hidden="true" />
             <h3 className="text-sm font-bold tracking-wide text-foreground">Safe Navigation</h3>
+            <span className="rounded-md bg-foreground/[0.06] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground/70">
+              {alertEvent} → {destinationLabel}
+            </span>
           </div>
           <div className="flex items-center gap-2 text-xs text-foreground/60">
             {isOffline && (
@@ -328,36 +331,76 @@ export function RespondQuickAction() {
         </header>
 
         {displayRoute || cachedRoute ? (
-          <div className="space-y-2 text-sm">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="text-base font-bold text-foreground">
-                {(displayRoute ?? cachedRoute!.route).name}
-              </span>
-              <span className="text-foreground/70">
-                → {displayDestName ?? cachedRoute?.destinationName ?? "Safe destination"}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <Stat label="Distance" value={`${(displayRoute ?? cachedRoute!.route).distanceMiles.toFixed(1)} mi`} />
-              <Stat label="ETA" value={`${Math.round((displayRoute ?? cachedRoute!.route).estimatedMinutes)} min`} />
-              <Stat label="Elev. gain" value={`${Math.round((displayRoute ?? cachedRoute!.route).elevationGain)} ft`} />
-            </div>
-            {((displayRoute ?? cachedRoute!.route).streets?.length ?? 0) > 0 && (
-              <details className="rounded-lg bg-foreground/[0.03] px-3 py-2">
-                <summary className="cursor-pointer text-xs font-semibold text-foreground/80">
-                  Turn-by-turn streets ({(displayRoute ?? cachedRoute!.route).streets!.length})
-                </summary>
-                <ol className="mt-2 list-decimal space-y-0.5 pl-5 text-xs text-foreground/75">
-                  {(displayRoute ?? cachedRoute!.route).streets!.slice(0, 12).map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ol>
-              </details>
-            )}
-            {(displayRoute ?? cachedRoute!.route).notes && (
-              <p className="text-xs text-foreground/60">{(displayRoute ?? cachedRoute!.route).notes}</p>
-            )}
-            {!displayRoute && cachedRoute && (
+          (() => {
+            const r = (displayRoute ?? cachedRoute!.route);
+            const steps = r.steps ?? [];
+            return (
+              <div className="space-y-2 text-sm">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="text-base font-bold text-foreground">{r.name}</span>
+                  <span className="text-foreground/70">
+                    → {displayDestName ?? cachedRoute?.destinationName ?? "Safe destination"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Stat label="Distance" value={`${r.distanceMiles.toFixed(1)} mi`} />
+                  <Stat label="ETA" value={`${Math.round(r.estimatedMinutes)} min`} />
+                  <Stat label="Elev. gain" value={`${Math.round(r.elevationGain)} ft`} />
+                </div>
+
+                {steps.length > 0 ? (
+                  <div className="rounded-lg border border-border bg-foreground/[0.02]">
+                    <div className="border-b border-border px-3 py-1.5 text-xs font-semibold text-foreground/80">
+                      Turn-by-turn directions ({steps.length})
+                    </div>
+                    <ol className="max-h-64 space-y-0 overflow-y-auto px-3 py-1 text-xs">
+                      {steps.map((s, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 border-b border-border/40 py-1.5 last:border-b-0"
+                        >
+                          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color:var(--severity-low)]/15 text-[10px] font-bold text-[color:var(--severity-low)]">
+                            {i + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-foreground/90">{s.instruction}</div>
+                            <div className="text-[10px] text-foreground/55">
+                              {s.distanceMiles >= 0.1
+                                ? `${s.distanceMiles.toFixed(1)} mi`
+                                : `${Math.round(s.distanceMiles * 5280)} ft`}
+                              {s.durationMinutes >= 1
+                                ? ` · ${Math.round(s.durationMinutes)} min`
+                                : ""}
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : (
+                  <p className="rounded-lg border border-dashed border-border px-3 py-2 text-xs text-foreground/60">
+                    Turn-by-turn directions unavailable (offline or routing service down). Head{" "}
+                    <span className="font-semibold">
+                      {r.name.replace(/.*\(([^)]+)\).*/, "$1")}
+                    </span>{" "}
+                    toward your nearest {destinationLabel}.
+                  </p>
+                )}
+
+                {r.notes && <p className="text-xs text-foreground/60">{r.notes}</p>}
+                {!displayRoute && cachedRoute && (
+                  <p className="text-xs text-amber-700">
+                    Showing last known route from {formatTime(cachedRoute.savedAt)}. Reconnect for live updates.
+                  </p>
+                )}
+              </div>
+            );
+          })()
+        ) : (
+          <p className="text-sm text-foreground/60">
+            {hasRealLocation ? "Calculating safe route…" : "Waiting for your location to compute a safe route."}
+          </p>
+        )}
               <p className="text-xs text-amber-700">
                 Showing last known route from {formatTime(cachedRoute.savedAt)}. Reconnect for live updates.
               </p>
