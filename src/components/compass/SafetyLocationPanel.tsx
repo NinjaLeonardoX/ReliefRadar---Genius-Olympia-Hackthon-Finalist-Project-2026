@@ -1001,6 +1001,67 @@ ${planBlocks}
                   </div>
                 )}
 
+                {/* Risk map tab */}
+                {bodyTab === "risk" && showRiskMap && (
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/55">
+                      Risk map — orient first
+                    </p>
+                    <p className="mt-1 text-xs text-card-foreground/65">
+                      Tap a hazard zone on the map or pick one from the list to see the rehearsal route.
+                    </p>
+                    <div className="mt-3 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+                      <div className="overflow-hidden rounded-2xl">
+                        {mapMounted ? (
+                          <Suspense
+                            fallback={
+                              <div className="flex h-[380px] items-center justify-center rounded-2xl bg-surface text-sm text-foreground/60">
+                                Loading risk map…
+                              </div>
+                            }
+                          >
+                            <PrepareRiskMap selectedHazardId={riskHazardId} onSelectHazard={setRiskHazardId} />
+                          </Suspense>
+                        ) : (
+                          <div className="flex h-[380px] items-center justify-center rounded-2xl bg-surface text-sm text-foreground/60">
+                            Loading risk map…
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
+                          Hazards near you
+                        </p>
+                        {HAZARD_RISKS.map((h) => {
+                          const active = h.id === riskHazardId;
+                          const sev = SEVERITY_META[h.severity];
+                          return (
+                            <button
+                              key={h.id}
+                              type="button"
+                              onClick={() => setRiskHazardId(h.id)}
+                              className={[
+                                "flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left transition-colors",
+                                active
+                                  ? "border-foreground/70 bg-card-foreground/5 ring-1 ring-foreground/20"
+                                  : "border-border hover:border-slate-300",
+                              ].join(" ")}
+                            >
+                              <span className="text-sm font-semibold">{h.shortLabel}</span>
+                              <span className="flex items-center gap-2">
+                                <SeverityBars severity={h.severity} />
+                                <span className="w-16 text-right text-xs font-medium" style={{ color: sev.color }}>
+                                  {sev.label}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Routes tab */}
                 {bodyTab === "routes" && (
                   <div>
