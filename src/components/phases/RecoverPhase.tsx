@@ -973,3 +973,168 @@ function HelpForm({
   );
 }
 
+// ── Broadcast Beacon ────────────────────────────────────────────────────────
+
+type ChannelOption = {
+  id: BroadcastChannel;
+  label: string;
+  desc: string;
+  Icon: LucideIcon;
+  defaultOn?: boolean;
+  requiresApproval?: boolean;
+};
+
+const BROADCAST_CHANNELS: ChannelOption[] = [
+  { id: "board", label: "Recovery Compass Board", desc: "Visible inside the app to nearby residents and coordinators.", Icon: Compass, defaultOn: true },
+  { id: "volunteers", label: "Nearby Help Warriors / Verified Volunteers", desc: "Direct alert to verified volunteers near your general location.", Icon: HandHeart },
+  { id: "partners", label: "Partner Organizations", desc: "Shelters, churches, nonprofits, clinics, food banks, cleanup teams.", Icon: Building2 },
+  { id: "website", label: "Community Website", desc: "Public page with private details removed.", Icon: Globe, requiresApproval: true },
+  { id: "sms", label: "SMS / Email / Push Alert", desc: "Send to nearby volunteers who opted in to alerts.", Icon: MessageSquare },
+  { id: "social", label: "Social Media Template", desc: "General location only. No address, phone, or medical details.", Icon: Share2, requiresApproval: true },
+  { id: "print", label: "Offline Recovery Hub Printable Card", desc: "Printable card for a physical board at a school, church, or shelter.", Icon: Printer },
+];
+
+function redactForPublic(text: string): string {
+  return text.replace(/\b\d{1,6}\s+(?=[A-Za-z])/g, "").trim();
+}
+
+function BroadcastBeacon({
+  draft,
+  onCancel,
+  onPost,
+}: {
+  draft: Omit<Need, "id" | "status">;
+  onCancel: () => void;
+  onPost: (channels: BroadcastChannel[]) => void;
+}) {
+  const [selected, setSelected] = useState<BroadcastChannel[]>(
+    BROADCAST_CHANNELS.filter((c) => c.defaultOn).map((c) => c.id),
+  );
+  const [showPreview, setShowPreview] = useState(false);
+
+  const sensitive = !!draft.vulnerable;
+  const toggle = (id: BroadcastChannel) =>
+    setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  const generalLocation = redactForPublic(draft.where);
+  const publicPreview = `[${draft.urgency}] ${draft.what} needed near ${generalLocation}. Reply via Recovery Compass to help. (No exact address shared.)`;
+  const internalPreview = `[${draft.urgency}] ${draft.what} — ${draft.where}${draft.vulnerable ? ` · Vulnerable: ${draft.vulnerable}` : ""}`;
+  const hasPublic = selected.some((c) => c === "website" || c === "social");
+
+  return (
+    <div className="dc-card space-y-4 p-5">
+      <div className="flex items-center justify-between">
+        <div className="inline-flex items-center gap-2">
+          <Radio className="h-4 w-4 text-[color:var(--severity-moderate)]" />
+          <h3 className="text-sm font-bold uppercase tracking-wider">Broadcast Beacon</h3>
+        </div>
+        <button type="button" onClick={onCancel} className="text-xs text-card-foreground/60 hover:text-foreground">
+          Cancel
+        </button>
+      </div>
+
+      <p className="text-xs text-card-foreground/70">
+        Your Need Beacon is saved as a <span className="font-semibold text-foreground">Draft</span>. Choose where it should be broadcast before posting. By default it posts to the Recovery Compass Board first.
+      </p>
+
+      <div className="rounded-xl border border-card-foreground/15 bg-background p-3 text-xs">
+        <p className="font-semibold text-foreground">{draft.what}</p>
+        <p className="text-card-foreground/70">
+          {draft.where} · {draft.urgency}
+          {draft.vulnerable ? ` · ${draft.vulnerable}` : ""}
+        </p>
+      </div>
+
+      <div className="flex items-start gap-2 rounded-xl border-l-4 border-[color:var(--severity-high)] bg-[color:var(--severity-high)]/5 p-3 text-xs">
+        <ShieldAlert className="mt-0.5 h-4 w-4 text-[color:var(--severity-high)]" />
+        <p className="text-card-foreground/80">
+          <span className="font-semibold text-foreground">For life-threatening emergencies, call 911</span> or local emergency services. Recovery Compass is for recovery support, not emergency rescue.
+        </p>
+      </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+          Broadcast this Need Beacon to:
+        </p>
+        <div className="grid gap-2">
+          {BROADCAST_CHANNELS.map((c) => {
+            const on = selected.includes(c.id);
+            return (
+              <label
+                key={c.id}
+                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
+                  on
+                    ? "border-[color:var(--severity-moderate)] bg-[color:var(--severity-moderate)]/10"
+                    : "border-card-foreground/15 bg-background hover:bg-card-foreground/5"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 accent-[color:var(--severity-moderate)]"
+                  checked={on}
+                  onChange={() => toggle(c.id)}
+                />
+                <c.Icon className="mt-0.5 h-4 w-4 text-[color:var(--severity-moderate)]" />
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground">
+                    {c.label}
+                    {c.requiresApproval && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--severity-high)]/15 px-2 py-0.5 text-[10px] font-semibold text-[color:var(--severity-high)]">
+                        <Lock className="h-3 w-3" /> Coordinator approval
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-card-foreground/65">{c.desc}</p>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {sensitive && hasPublic && (
+        <div className="flex items-start gap-2 rounded-xl border-l-4 border-[color:var(--severity-moderate)] bg-[color:var(--severity-moderate)]/10 p-3 text-xs">
+          <Eye className="mt-0.5 h-4 w-4 text-[color:var(--severity-moderate)]" />
+          <p className="text-card-foreground/80">
+            This beacon includes vulnerable household details. Public channels will be reviewed by a coordinator before going live.
+          </p>
+        </div>
+      )}
+
+      {showPreview && (
+        <div className="space-y-2 rounded-xl border border-card-foreground/15 bg-background p-3 text-xs">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+            Public preview (website / social)
+          </p>
+          <p className="rounded-lg bg-card-foreground/5 p-2 text-card-foreground/85">{publicPreview}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/70">
+            Coordinator / volunteer preview
+          </p>
+          <p className="rounded-lg bg-card-foreground/5 p-2 text-card-foreground/85">{internalPreview}</p>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setShowPreview((p) => !p)}
+          className="inline-flex items-center gap-2 rounded-full border border-card-foreground/20 px-4 py-2 text-sm font-semibold text-card-foreground/85 hover:bg-card-foreground/5"
+        >
+          <Eye className="h-4 w-4" />
+          {showPreview ? "Hide preview" : "Preview Beacon"}
+        </button>
+        <button
+          type="button"
+          disabled={selected.length === 0}
+          onClick={() => onPost(selected)}
+          className="inline-flex items-center gap-2 rounded-full bg-[color:var(--severity-high)] px-5 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50"
+        >
+          <Megaphone className="h-4 w-4" />
+          Post Beacon
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
