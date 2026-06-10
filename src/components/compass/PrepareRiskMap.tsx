@@ -30,6 +30,8 @@ interface Props {
 
 export default function PrepareRiskMap({ selectedHazardId, onSelectHazard }: Props) {
   const household = useHousehold();
+  const { activeAddress } = useLocation();
+  const markerLabel = activeAddress?.name ?? "Your location";
   const zonedHazards = HAZARD_RISKS.filter((h) => h.zone !== null);
   const center: [number, number] =
     household.lat && household.lng ? [household.lat, household.lng] : MAP_CENTER;
