@@ -34,7 +34,7 @@ export function HouseholdCard({ onGeneratePlan, riskMap }: Props) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-card-foreground/55">
-            Household
+            Residence/Commercial
           </p>
           <h2 className="mt-1 truncate text-xl font-bold tracking-tight">{title}</h2>
           <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-card-foreground/65">
