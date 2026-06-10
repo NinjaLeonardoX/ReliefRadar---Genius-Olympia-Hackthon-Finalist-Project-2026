@@ -580,15 +580,20 @@ function BeaconsPanel({
   const [what, setWhat] = useState("");
   const [where, setWhere] = useState("");
   const [urgency, setUrgency] = useState<Beacon["urgency"]>("Urgent");
+  const [hint, setHint] = useState<string | null>(null);
 
   function add() {
-    if (!what.trim() || !where.trim()) return;
+    if (!what.trim()) {
+      setHint("Describe what's needed (e.g. water, ride, medicine).");
+      return;
+    }
     setBeacons([
-      { id: `b${Date.now()}`, what: what.trim(), where: where.trim(), urgency, status: "Open", createdAt: Date.now() },
+      { id: `b${Date.now()}`, what: what.trim(), where: where.trim() || "Location TBD", urgency, status: "Open", createdAt: Date.now() },
       ...beacons,
     ]);
     setWhat("");
     setWhere("");
+    setHint(null);
   }
 
   function setStatus(id: string, status: Beacon["status"]) {
@@ -611,17 +616,18 @@ function BeaconsPanel({
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_auto_auto]">
-        <input value={what} onChange={(e) => setWhat(e.target.value)} placeholder="What (e.g. water)" className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs" />
-        <input value={where} onChange={(e) => setWhere(e.target.value)} placeholder="Where" className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs" />
+        <input value={what} onChange={(e) => { setWhat(e.target.value); if (hint) setHint(null); }} onKeyDown={(e) => e.key === "Enter" && add()} placeholder="What (required, e.g. water)" className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs" />
+        <input value={where} onChange={(e) => setWhere(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} placeholder="Where (optional)" className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs" />
         <select value={urgency} onChange={(e) => setUrgency(e.target.value as Beacon["urgency"])} className="rounded-lg border border-border bg-white px-2 py-1.5 text-xs">
           <option>Urgent</option>
           <option>Soon</option>
           <option>Whenever</option>
         </select>
-        <button onClick={add} className="inline-flex items-center gap-1 rounded-lg bg-[color:var(--severity-high)] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110">
+        <button type="button" onClick={add} className="inline-flex items-center gap-1 rounded-lg bg-[color:var(--severity-high)] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110">
           <Plus className="h-3.5 w-3.5" /> Add
         </button>
       </div>
+      {hint && <p className="mt-2 text-[11px] font-medium text-[color:var(--severity-high)]">{hint}</p>}
 
       <ul className="mt-4 space-y-2">
         {beacons.map((b) => {
