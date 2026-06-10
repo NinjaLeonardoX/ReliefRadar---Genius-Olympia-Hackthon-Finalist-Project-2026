@@ -99,13 +99,13 @@ function LandingPage() {
 
             {/* Hero image */}
             <div className="lg:col-span-5">
-              <div className="relative">
+              <div className="relative h-full min-h-[420px] lg:min-h-[560px]">
                 <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-[#16A34A]/25 to-transparent blur-2xl" />
-                <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/50 ring-1 ring-white/5">
+                <div className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/50 ring-1 ring-white/5">
                   <img
                     src={heroEvacuation.url}
                     alt="A family follows a glowing green evacuation route to safety as floodwaters rise at dusk"
-                    className="h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                     loading="eager"
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0f1a2e]/70 via-transparent to-transparent" />
