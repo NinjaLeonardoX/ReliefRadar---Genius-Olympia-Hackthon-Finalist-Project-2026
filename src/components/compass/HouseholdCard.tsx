@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
 import { Users, Baby, PawPrint, Car, Stethoscope, Accessibility, UserRound, MapPin } from "lucide-react";
 import { useLocation } from "@/components/LocationContext";
 
 interface Props {
   onGeneratePlan?: () => void;
+  riskMap?: ReactNode;
 }
 
 const ATTRS = [
