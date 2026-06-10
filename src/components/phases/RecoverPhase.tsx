@@ -332,18 +332,13 @@ export function RecoverPhase() {
       {openForm === "broadcast" && draftNeed && (
         <BroadcastBeacon
           draft={draftNeed}
+          sending={sending}
           onCancel={() => {
+            if (sending) return;
             setDraftNeed(null);
             setOpenForm(null);
           }}
-          onPost={(channels) => {
-            setNeeds((prev) => [
-              { ...draftNeed, id: `n${Date.now()}`, status: "Posted", channels },
-              ...prev,
-            ]);
-            setDraftNeed(null);
-            setOpenForm(null);
-          }}
+          onPost={postBeacon}
         />
       )}
       {openForm === "help" && (
