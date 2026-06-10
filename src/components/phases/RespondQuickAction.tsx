@@ -109,10 +109,28 @@ export function RespondQuickAction() {
   const hasRealLocation = source === "device";
   const home: [number, number] = [household.lat, household.lng];
 
+  // Active alert event from NWS for the user's location. Defaults to
+  // "Heat Wave" when no alert is active or the fetch fails.
+  const [alertEvent, setAlertEvent] = useState<string>("Heat Wave");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchAlertsByPoint(home[0], home[1], controller.signal)
+      .then((res) => {
+        const top = res?.alerts?.[0]?.event;
+        setAlertEvent(top && top !== "Unknown event" ? top : "Heat Wave");
+      })
+      .catch(() => setAlertEvent("Heat Wave"));
+    return () => controller.abort();
+  }, [home[0], home[1], refreshTick]);
+
+  // Disaster type is derived from the active alert so the destinations match
+  // the hazard (heat wave → cooling centers, flood → higher ground, etc.).
+  const disasterType = useMemo(() => eventToDisaster(alertEvent), [alertEvent]);
+  const destinationLabel = DISASTER_LABEL[disasterType];
+
   // Location-aware evacuation: synthesize safe destinations near the real
-  // location and route via ORS (or honest straight-line fallback). Always yields
-  // a line, regardless of how far the user is from the seed scenario.
-  const { routes, destinations } = useEvacuationRoutes(home, "flood", true, refreshTick);
+  // location and route via ORS (or honest straight-line fallback).
+  const { routes, destinations } = useEvacuationRoutes(home, disasterType, true, refreshTick);
 
   // Active alert event from NWS for the user's location. Defaults to
   // "Heat Wave" when no alert is active or the fetch fails.
