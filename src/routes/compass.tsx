@@ -10,7 +10,7 @@ import { useLocation } from "../components/LocationContext";
 export const Route = createFileRoute("/compass")({
   head: () => ({
     meta: [
-      { title: "DisasterCompass — One family. Three moments. One clear plan." },
+      { title: "Disaster Compass — One family. Three moments. One clear plan." },
       {
         name: "description",
         content:
@@ -45,11 +45,12 @@ function CompassPage() {
             <footer className="rounded-2xl border border-border/60 bg-white p-5 text-center text-sm text-card-foreground/75 shadow-sm">
               <p className="font-semibold text-card-foreground">Data → Rules → Action</p>
               <p className="mt-1 text-xs">
-                <span className="font-medium">Data:</span> household needs, hazards, shelters, routes, volunteers
-                &nbsp;·&nbsp;
-                <span className="font-medium">Rules:</span> GO / STAY / WAIT, route scoring, volunteer matching, recovery priority
-                &nbsp;·&nbsp;
-                <span className="font-medium">Action:</span> safe route, volunteer help, recovery packet
+                <span className="font-medium">Data:</span> household needs, hazards, shelters,
+                routes, volunteers &nbsp;·&nbsp;
+                <span className="font-medium">Rules:</span> GO / STAY / WAIT, route scoring,
+                volunteer matching, recovery priority &nbsp;·&nbsp;
+                <span className="font-medium">Action:</span> safe route, volunteer help, recovery
+                packet
               </p>
               <p className="mt-2 text-[11px] italic text-card-foreground/55">
                 AI explains. Rules decide. Humans approve.
@@ -62,11 +63,12 @@ function CompassPage() {
               Location required
             </p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight">
-              Set your location to activate DisasterCompass
+              Set your location to activate Disaster Compass
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-sm text-card-foreground/70">
-              Prepare, Respond, and Recover all depend on where you are. Use the panel above to share
-              your location or enter an address — the rest of the system will appear once it's set.
+              Prepare, Respond, and Recover all depend on where you are. Use the panel above to
+              share your location or enter an address — the rest of the system will appear once it's
+              set.
             </p>
           </section>
         )}

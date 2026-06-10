@@ -26,13 +26,13 @@ export function LifecycleDashboard() {
     <section aria-label="Lifecycle dashboard" className="space-y-5">
       <div className="max-w-3xl">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--severity-low)]">
-          The DisasterCompass system
+          The Disaster Compass system
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-[color:var(--foreground)] sm:text-4xl">
           One family. Three moments. One clear plan.
         </h1>
         <p className="mt-2 text-base text-[color:var(--muted-foreground)]">
-          DisasterCompass uses the same household profile and neighbor network before, during, and
+          Disaster Compass uses the same household profile and neighbor network before, during, and
           after impact.
         </p>
       </div>
@@ -49,7 +49,7 @@ export function LifecycleDashboard() {
             statusLabel="Needs Support Before Impact"
             statusTone="amber"
             Icon={Radar}
-            tooltip="Preparedness is not just a checklist. DisasterCompass finds who may struggle before the warning becomes urgent."
+            tooltip="Preparedness is not just a checklist. Disaster Compass finds who may struggle before the warning becomes urgent."
             tagline="Preparedness = rehearsal before the siren."
             actions={[
               "Pre-match transport support",
@@ -98,7 +98,7 @@ export function LifecycleDashboard() {
             statusLabel="Recovery Packet Ready"
             statusTone="navy"
             Icon={LifeBuoy}
-            tooltip="Recovery starts while details are still fresh. DisasterCompass turns recovery into one guided next-action queue."
+            tooltip="Recovery starts while details are still fresh. Disaster Compass turns recovery into one guided next-action queue."
             tagline="Recovery = guided next steps, not a forgotten checklist."
             actions={[
               "Confirm everyone is safe",

@@ -6,11 +6,13 @@ import {
   LifeBuoy,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   ArrowRight,
   Maximize2,
   Minimize2,
   Download,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import { SiteHeader } from "../components/SiteHeader";
 import dcLogo from "@/assets/disaster-compass-logo.png.asset.json";
@@ -18,10 +20,10 @@ import dcLogo from "@/assets/disaster-compass-logo.png.asset.json";
 export const Route = createFileRoute("/presentation")({
   head: () => ({
     meta: [
-      { title: "Presentation — DisasterCompass" },
+      { title: "Presentation — Disaster Compass" },
       {
         name: "description",
-        content: "A short slide deck introducing DisasterCompass.",
+        content: "A short slide deck introducing Disaster Compass.",
       },
     ],
   }),
@@ -42,6 +44,8 @@ type Slide = {
   decision?: string[];
   positioning?: string[];
   flow?: { inputs: string[]; core: string[]; output: string };
+  tech?: { layers: { label: string; items: string[] }[]; tooling?: string[] };
+  aiTools?: { name: string; use: string }[];
   columns?: Column[];
   bullets?: string[];
   footer?: string;
@@ -80,7 +84,7 @@ const slides: Slide[] = [
   {
     eyebrow: "Strategy — What we built",
     title: "From alert to safest next action.",
-    lead: "DisasterCompass is a Community Disaster Action Planner. Its core output is a single decision:",
+    lead: "Disaster Compass is a Community Disaster Action Planner. Its core output is a single decision:",
     decision: ["GO", "STAY", "WAIT"],
     positioning: ["Not another alert app", "Not a checklist", "Not just a map"],
     footer:
@@ -97,7 +101,38 @@ const slides: Slide[] = [
     },
     footer: "AI explains. Rules decide. Humans approve.",
   },
-  // 4 — Product process
+  // 4 — Tech stack (systems diagram)
+  {
+    eyebrow: "System architecture — tech stack",
+    title: "How it's built.",
+    tech: {
+      layers: [
+        {
+          label: "Client",
+          items: ["React", "TypeScript", "Tailwind CSS", "shadcn/ui (Radix)", "Leaflet maps"],
+        },
+        {
+          label: "App framework",
+          items: ["TanStack Start (SSR)", "TanStack Router", "TanStack Query"],
+        },
+        {
+          label: "Rules core",
+          items: ["Action engine", "Route scoring", "Volunteer matching", "Recovery steps"],
+        },
+        {
+          label: "Backend & data",
+          items: ["Supabase (Postgres · Auth)", "Seed data (North Creek)"],
+        },
+        {
+          label: "Live signals",
+          items: ["NOAA / NWS alerts", "Weather & routing APIs", "Fallback-guarded"],
+        },
+      ],
+      tooling: ["Vite", "Bun", "ESLint", "Prettier"],
+    },
+    footer: "A thin, explainable stack — rules in plain TypeScript, live data behind fallbacks.",
+  },
+  // 5 — Product process
   {
     eyebrow: "Product process",
     title: "One system across Prepare, Respond, Recover.",
@@ -132,16 +167,29 @@ const slides: Slide[] = [
       "Recovery checklist",
     ],
     footer:
-      "DisasterCompass helps communities prepare earlier, respond faster, and recover clearer.",
+      "Disaster Compass helps communities prepare earlier, respond faster, and recover clearer.",
     close: "We turn official information into local action.",
   },
-  // 6 — Closing
+  // 7 — AI disclosure
+  {
+    eyebrow: "Transparency — AI disclosure",
+    title: "AI tools we used.",
+    aiTools: [
+      { name: "ChatGPT", use: "Ideation, copywriting, and research" },
+      { name: "Claude (Claude Code)", use: "Code generation and implementation" },
+      { name: "Lovable", use: "Full-stack app scaffolding and hosting" },
+      { name: "Gamma", use: "Presentation design support" },
+      { name: "FlowScholar", use: "Research and source-finding" },
+    ],
+    note: "AI accelerated the build, but the rules engine stays deterministic and human-reviewed: AI explains, rules decide, humans approve.",
+  },
+  // 8 — Closing
   {
     cover: true,
     eyebrow: "",
     kicker: "Thank you",
     title: "We turn official information into local action.",
-    tagline: "DisasterCompass · Community Disaster Action Planner",
+    tagline: "Disaster Compass · Community Disaster Action Planner",
   },
 ];
 
@@ -170,7 +218,7 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
           )}
 
           <div className="mt-8 rounded-2xl bg-white px-7 py-5 shadow-2xl shadow-black/40">
-            <img src={dcLogo.url} alt="DisasterCompass" className="h-16 w-auto" />
+            <img src={dcLogo.url} alt="Disaster Compass" className="h-16 w-auto" />
           </div>
 
           <h2 className="mt-9 max-w-3xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
@@ -182,7 +230,7 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
         </div>
 
         <div className="absolute inset-x-0 bottom-6 text-[11px] font-medium uppercase tracking-[0.2em] text-white/40">
-          DisasterCompass · 2026
+          Disaster Compass · 2026
         </div>
       </div>
     );
@@ -199,7 +247,7 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
       {/* Template header */}
       <div className="relative flex items-center justify-between border-b border-white/10 px-8 pb-4 pt-6 sm:px-12">
         <div className="rounded-md bg-white px-2.5 py-1.5 shadow-sm">
-          <img src={dcLogo.url} alt="DisasterCompass" className="h-7 w-auto" />
+          <img src={dcLogo.url} alt="Disaster Compass" className="h-7 w-auto" />
         </div>
         <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#5EE6A1] sm:text-xs">
           <Compass className="h-3.5 w-3.5" />
@@ -299,6 +347,49 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
           </div>
         )}
 
+        {/* Tech-stack systems diagram */}
+        {slide.tech && (
+          <div className="mt-6 space-y-1.5">
+            {slide.tech.layers.map((layer, i) => (
+              <div key={layer.label}>
+                <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:flex-row sm:items-center">
+                  <span className="w-36 shrink-0 text-xs font-semibold uppercase tracking-wider text-[#5EE6A1]">
+                    {layer.label}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {layer.items.map((it) => (
+                      <span
+                        key={it}
+                        className="rounded-lg bg-white/[0.06] px-3 py-1.5 text-sm text-white/85 ring-1 ring-white/10"
+                      >
+                        {it}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {i < (slide.tech?.layers.length ?? 0) - 1 && (
+                  <div className="flex justify-center py-0.5">
+                    <ChevronDown className="h-4 w-4 text-white/30" />
+                  </div>
+                )}
+              </div>
+            ))}
+            {slide.tech.tooling && (
+              <div className="flex flex-wrap items-center gap-2 pt-3 text-xs text-white/50">
+                <span className="font-semibold uppercase tracking-wider">Tooling</span>
+                {slide.tech.tooling.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full bg-white/[0.05] px-2.5 py-1 ring-1 ring-white/10"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Three-phase columns */}
         {slide.columns && (
           <div className="mt-7 grid gap-4 sm:grid-cols-3">
@@ -329,6 +420,21 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
           </div>
         )}
 
+        {/* AI disclosure */}
+        {slide.aiTools && (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {slide.aiTools.map((t) => (
+              <div key={t.name} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 shrink-0 text-[#5EE6A1]" />
+                  <p className="text-base font-semibold text-white">{t.name}</p>
+                </div>
+                <p className="mt-1.5 text-sm text-white/60">{t.use}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {slide.note && (
           <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/60">{slide.note}</p>
         )}
@@ -350,7 +456,7 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
 
       {/* Template footer */}
       <div className="relative flex items-center justify-between border-t border-white/10 px-8 py-3.5 text-[11px] font-medium text-white/40 sm:px-12">
-        <span>DisasterCompass · Community Disaster Action Planner</span>
+        <span>Disaster Compass · Community Disaster Action Planner</span>
         <span>
           {index + 1} / {total}
         </span>
