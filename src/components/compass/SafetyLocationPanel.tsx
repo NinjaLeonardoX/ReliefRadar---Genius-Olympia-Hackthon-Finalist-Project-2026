@@ -1564,6 +1564,43 @@ function Field({ label, value, accent }: { label: string; value: string; accent?
   );
 }
 
+function AnswerRow({
+  question,
+  value,
+  onChange,
+}: {
+  question: string;
+  value: Answer;
+  onChange: (v: Answer) => void;
+}) {
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-background px-2.5 py-1.5">
+      <span className="min-w-0 flex-1 text-sm text-foreground">{question}</span>
+      <div className="flex gap-1">
+        <button
+          onClick={() => onChange("yes")}
+          className={`rounded px-2 py-0.5 text-[11px] font-semibold transition-colors ${
+            value === "yes"
+              ? "bg-[color:var(--severity-low)] text-white"
+              : "border border-border bg-background text-card-foreground/80 hover:bg-surface"
+          }`}
+        >
+          Yes
+        </button>
+        <button
+          onClick={() => onChange("no")}
+          className={`rounded px-2 py-0.5 text-[11px] font-semibold transition-colors ${
+            value === "no"
+              ? "bg-[color:var(--severity-moderate)] text-white"
+              : "border border-border bg-background text-card-foreground/80 hover:bg-surface"
+          }`}
+        >
+          No
+        </button>
+      </div>
+    </li>
+  );
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Wizard modal
 // ─────────────────────────────────────────────────────────────────────────────
