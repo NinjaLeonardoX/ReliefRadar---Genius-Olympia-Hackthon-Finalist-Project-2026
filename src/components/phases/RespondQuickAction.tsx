@@ -70,6 +70,22 @@ export function RespondQuickAction() {
   // a line, regardless of how far the user is from the seed scenario.
   const { routes, destinations } = useEvacuationRoutes(home, "flood", true);
 
+  // Active alert event from NWS for the user's location. Defaults to
+  // "Heat Wave" when no alert is active or the fetch fails.
+  const [alertEvent, setAlertEvent] = useState<string>("Heat Wave");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchAlertsByPoint(home[0], home[1], controller.signal)
+      .then((res) => {
+        const top = res?.alerts?.[0]?.event;
+        setAlertEvent(top && top !== "Unknown event" ? top : "Heat Wave");
+      })
+      .catch(() => setAlertEvent("Heat Wave"));
+    return () => controller.abort();
+  }, [home[0], home[1]]);
+
+
+
 
   const onAction = (a: ActionDef) => {
     setStatus(a.id);
