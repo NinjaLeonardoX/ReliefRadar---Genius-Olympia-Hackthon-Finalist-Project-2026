@@ -155,15 +155,17 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       };
     }
     if (coords) {
+      const placeLabel = deviceResolved
+        ? `${deviceResolved.city ?? deviceResolved.county ?? "your location"}${
+            deviceResolved.state ? `, ${deviceResolved.state}` : ""
+          }`
+        : "your current location";
       const household: Household = {
         ...RIVERA_HOUSEHOLD,
+        name: `Household near ${placeLabel}`,
         lat: coords.lat,
         lng: coords.lng,
-        locationName: deviceResolved
-          ? `Near ${deviceResolved.city ?? deviceResolved.county ?? "you"}${
-              deviceResolved.state ? `, ${deviceResolved.state}` : ""
-            }`
-          : "Your current location",
+        locationName: deviceResolved ? `Near ${placeLabel}` : "Your current location",
       };
       return {
         ...base,
