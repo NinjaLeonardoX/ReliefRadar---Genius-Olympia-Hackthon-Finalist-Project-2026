@@ -43,7 +43,22 @@ export function PreparePhase() {
   // One lens — the rollup selector (rendered in the page content) zooms the
   // readiness view from your household out to community, town, state, national.
   const { scope } = usePhase();
+  const { activeAddress, resolved } = useLocation();
+  const householdLabel = activeAddress?.name ?? "Your household";
+  const townLabel = resolved?.city ?? resolved?.county ?? "your town";
+  const stateLabel = resolved?.state ?? resolved?.stateCode ?? "your state";
+  const nationLabel = resolved?.country ?? "your country";
   const scopeMeta = getScopeMeta(scope);
+  const scopePlaceLabel =
+    scope === "household"
+      ? householdLabel
+      : scope === "community"
+        ? (resolved?.city ? `near ${resolved.city}` : "your area")
+        : scope === "town"
+          ? townLabel
+          : scope === "state"
+            ? stateLabel
+            : nationLabel;
   const [selectedId, setSelectedId] = useState<string>("flood");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
