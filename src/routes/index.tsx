@@ -3,13 +3,13 @@ import {
   Compass,
   ShieldCheck,
   LifeBuoy,
-  AlertTriangle,
   ArrowRight,
   Sparkles,
   Activity,
   CheckCircle2,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
+import heroEvacuation from "@/assets/hero-evacuation.png.asset.json";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -104,53 +104,18 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Compass card preview */}
+            {/* Hero image */}
             <div className="lg:col-span-5">
               <div className="relative">
-                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-[#16A34A]/20 to-transparent blur-2xl" />
-                <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#2a3b55]/70 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-red-300 ring-1 ring-red-500/30">
-                      <AlertTriangle className="h-3 w-3" />
-                      Flood Warning
-                    </span>
-                    <span className="text-[11px] text-white/50">Demo · North Creek</span>
-                  </div>
-
-                  <div className="mt-5">
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/50">
-                      Recommended action
-                    </p>
-                    <h3 className="mt-2 text-3xl font-bold leading-tight">Go to higher ground</h3>
-                    <p className="mt-1 text-sm text-white/60">
-                      Hilltop Community Center · 3.0 mi · ETA 35 min
-                    </p>
-                  </div>
-
-                  <div className="mt-5 flex items-center gap-2">
-                    <span className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#16A34A] px-3 text-xs font-bold text-white">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      GO — Route B
-                    </span>
-                    <span className="inline-flex h-9 items-center rounded-lg bg-white/10 px-3 text-xs font-medium text-white/80 ring-1 ring-white/10">
-                      Route A rejected (flooded bridge)
-                    </span>
-                  </div>
-
-                  <div className="mt-6 grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
-                    {[
-                      { label: "Route B Score", value: "91", tone: "text-[#5EE6A1]" },
-                      { label: "Households", value: "5", tone: "text-white" },
-                      { label: "Need Help", value: "2", tone: "text-amber-300" },
-                    ].map((s) => (
-                      <div key={s.label}>
-                        <p className="text-[10px] uppercase tracking-wider text-white/40">
-                          {s.label}
-                        </p>
-                        <p className={`mt-1 text-2xl font-bold ${s.tone}`}>{s.value}</p>
-                      </div>
-                    ))}
-                  </div>
+                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-[#16A34A]/25 to-transparent blur-2xl" />
+                <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/50 ring-1 ring-white/5">
+                  <img
+                    src={heroEvacuation.url}
+                    alt="A family follows a glowing green evacuation route to safety as floodwaters rise at dusk"
+                    className="h-full w-full object-cover"
+                    loading="eager"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0f1a2e]/70 via-transparent to-transparent" />
                 </div>
               </div>
             </div>
