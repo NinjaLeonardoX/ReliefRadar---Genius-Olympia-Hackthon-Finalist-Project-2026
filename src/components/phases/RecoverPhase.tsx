@@ -387,81 +387,94 @@ export function RecoverPhase() {
           </span>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-stretch">
-          {/* West col */}
-          <CompassQuadrant
-            label="WEST · Recovery Progress"
-            icon={<CheckCircle2 className="h-4 w-4 text-[color:var(--severity-low)]" />}
-            items={SEED_PROGRESS.map((p) => ({
-              title: p.what,
-              sub: p.where,
-              tag: p.status,
-              tagColor: STATUS_TONE[p.status],
-            }))}
-          />
-
-          {/* Center compass */}
-          <div className="flex flex-col items-center justify-between gap-4">
-            <QuadHeader dir="NORTH" label="Urgent Needs" color="var(--severity-high)" />
-            <div className="relative flex h-44 w-44 items-center justify-center rounded-full border-2 border-card-foreground/15 bg-card-foreground/[0.03]">
-              <div className="absolute inset-4 rounded-full border border-dashed border-card-foreground/15" />
-              <div className="absolute left-1/2 top-0 -translate-x-1/2 text-[10px] font-bold text-[color:var(--severity-high)]">
-                N
-              </div>
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[color:var(--severity-low)]">
-                E
-              </div>
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[color:var(--severity-moderate)]">
-                S
-              </div>
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[color:var(--severity-low)]">
-                W
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <Navigation className="h-7 w-7 text-[color:var(--severity-moderate)]" />
-                <p className="mt-1 text-[11px] font-semibold text-foreground">{householdLabel}</p>
-                <p className="text-[10px] text-card-foreground/60">{scopeLabel}</p>
-              </div>
-            </div>
-            <QuadHeader dir="SOUTH" label="Safe Places" color="var(--severity-moderate)" />
+        {/* Cross layout: NORTH on top, WEST | CENTER | EAST middle, SOUTH bottom */}
+        <div className="mt-5 space-y-4">
+          {/* NORTH */}
+          <div className="mx-auto w-full md:w-2/3">
+            <CompassQuadrant
+              label="NORTH · Urgent Needs"
+              icon={<AlertTriangle className="h-4 w-4 text-[color:var(--severity-high)]" />}
+              items={needs.map((n) => ({
+                title: n.what,
+                sub: `${n.where}${n.vulnerable ? ` · ${n.vulnerable}` : ""}`,
+                tag: n.urgency,
+                tagColor: URGENCY_TONE[n.urgency],
+              }))}
+            />
           </div>
 
-          {/* East col */}
-          <CompassQuadrant
-            label="EAST · Available Help"
-            icon={<HandHeart className="h-4 w-4 text-[color:var(--severity-low)]" />}
-            items={helpers.map((h) => ({
-              title: h.offer,
-              sub: `${h.where} · ${h.distance}`,
-              tag: h.available,
-              tagColor: "var(--severity-low)",
-            }))}
-          />
+          {/* WEST | CENTER COMPASS | EAST */}
+          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
+            <CompassQuadrant
+              label="WEST · Recovery Progress"
+              icon={<CheckCircle2 className="h-4 w-4 text-[color:var(--severity-low)]" />}
+              items={SEED_PROGRESS.map((p) => ({
+                title: p.what,
+                sub: p.where,
+                tag: p.status,
+                tagColor: STATUS_TONE[p.status],
+              }))}
+            />
+
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative flex h-48 w-48 items-center justify-center rounded-full border-2 border-card-foreground/15 bg-card-foreground/[0.03]">
+                <div className="absolute inset-4 rounded-full border border-dashed border-card-foreground/15" />
+                <div className="absolute left-1/2 top-1 -translate-x-1/2 text-[10px] font-bold text-[color:var(--severity-high)]">
+                  N
+                </div>
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[color:var(--severity-low)]">
+                  E
+                </div>
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[color:var(--severity-moderate)]">
+                  S
+                </div>
+                <div className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[color:var(--severity-low)]">
+                  W
+                </div>
+                {/* Needle points NORTH (up) toward urgent help */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <Navigation
+                    className="h-12 w-12 text-[color:var(--severity-high)] drop-shadow"
+                    aria-label="Compass pointing north toward urgent needs"
+                  />
+                </div>
+                <div className="absolute bottom-3 flex flex-col items-center text-center">
+                  <p className="text-[11px] font-semibold text-foreground">{householdLabel}</p>
+                  <p className="text-[10px] text-card-foreground/60">{scopeLabel}</p>
+                </div>
+              </div>
+              <p className="mt-2 text-center text-[11px] text-card-foreground/65">
+                Pointing where help is needed most
+              </p>
+            </div>
+
+            <CompassQuadrant
+              label="EAST · Available Help"
+              icon={<HandHeart className="h-4 w-4 text-[color:var(--severity-low)]" />}
+              items={helpers.map((h) => ({
+                title: h.offer,
+                sub: `${h.where} · ${h.distance}`,
+                tag: h.available,
+                tagColor: "var(--severity-low)",
+              }))}
+            />
+          </div>
+
+          {/* SOUTH */}
+          <div className="mx-auto w-full md:w-2/3">
+            <CompassQuadrant
+              label="SOUTH · Safe Places"
+              icon={<Home className="h-4 w-4 text-[color:var(--severity-moderate)]" />}
+              items={SEED_SAFE.map((s) => ({
+                title: `${s.name} (${s.type})`,
+                sub: s.where,
+                tag: s.status,
+                tagColor: "var(--severity-low)",
+              }))}
+            />
+          </div>
         </div>
 
-        {/* North & South strips */}
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <CompassQuadrant
-            label="NORTH · Urgent Needs"
-            icon={<AlertTriangle className="h-4 w-4 text-[color:var(--severity-high)]" />}
-            items={needs.map((n) => ({
-              title: n.what,
-              sub: `${n.where}${n.vulnerable ? ` · ${n.vulnerable}` : ""}`,
-              tag: n.urgency,
-              tagColor: URGENCY_TONE[n.urgency],
-            }))}
-          />
-          <CompassQuadrant
-            label="SOUTH · Safe Places"
-            icon={<Home className="h-4 w-4 text-[color:var(--severity-moderate)]" />}
-            items={SEED_SAFE.map((s) => ({
-              title: `${s.name} (${s.type})`,
-              sub: s.where,
-              tag: s.status,
-              tagColor: "var(--severity-low)",
-            }))}
-          />
-        </div>
       </div>
 
       {/* Compass Match */}
