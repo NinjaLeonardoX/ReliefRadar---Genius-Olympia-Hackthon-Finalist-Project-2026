@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { HouseholdCard } from "../compass/HouseholdCard";
+import { SafetyLocationPanel } from "../compass/SafetyLocationPanel";
 import { VolunteerMatchCard } from "../compass/VolunteerMatchCard";
 import { usePhase } from "../PhaseContext";
 import {
@@ -88,6 +89,8 @@ export function PreparePhase() {
           Orient on the risk map → pick a hazard → see your route → fix your gaps.
         </p>
       </div>
+
+      <SafetyLocationPanel />
 
       <RollupPanel />
 
