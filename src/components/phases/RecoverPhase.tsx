@@ -453,7 +453,7 @@ export function RecoverPhase() {
         <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-card-foreground/65">
           <Clock className="h-3.5 w-3.5" />
           Status flow:
-          {(["Open", "Matched", "In Progress", "Completed"] as Status[]).map((s, i, arr) => (
+          {(["Draft", "Posted", "Matched", "In Progress", "Completed"] as Status[]).map((s, i, arr) => (
             <span key={s} className="inline-flex items-center gap-2">
               <span
                 className="rounded-full px-2 py-0.5 font-semibold"
