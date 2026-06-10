@@ -1,6 +1,7 @@
 import { Radar, Compass as CompassIcon, LifeBuoy, ArrowUpRight, Camera } from "lucide-react";
 import { LifecycleCard } from "./LifecycleCard";
 import { usePhase } from "./PhaseContext";
+import { useLocation } from "./LocationContext";
 import {
   HAZARD_RISKS,
   SEVERITY_META,
