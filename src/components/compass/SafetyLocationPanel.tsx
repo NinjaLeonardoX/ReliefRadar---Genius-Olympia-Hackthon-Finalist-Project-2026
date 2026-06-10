@@ -815,7 +815,7 @@ ${planBlocks}
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
-                className="inline-flex min-w-[260px] items-center justify-between gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-left text-xs font-medium text-foreground hover:bg-surface"
+                className="inline-flex min-w-[260px] items-center justify-between gap-2 rounded-lg border border-border bg-white px-3 py-1.5 text-left text-xs font-medium text-black hover:bg-gray-100"
               >
                 <span className="truncate">
                   {selected.name} · {selected.ready ? readinessLabel(selected.readinessScore) : "Needs Readiness Setup"}
@@ -823,7 +823,7 @@ ${planBlocks}
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 z-30 mt-1 w-[320px] overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+                <div className="absolute right-0 z-30 mt-1 w-[320px] overflow-hidden rounded-lg border border-border bg-white shadow-xl">
                   <ul className="max-h-72 overflow-auto py-1">
                     {locations.map((l) => {
                       const active = l.id === selectedId;
@@ -834,11 +834,11 @@ ${planBlocks}
                               setSelectedId(l.id);
                               setDropdownOpen(false);
                             }}
-                            className={`flex w-full items-start gap-2 px-3 py-2 text-left text-xs hover:bg-surface ${active ? "bg-surface/70" : ""}`}
+                            className={`flex w-full items-start gap-2 px-3 py-2 text-left text-xs text-black hover:bg-gray-100 ${active ? "bg-gray-100" : ""}`}
                           >
-                            <MapPin className="mt-0.5 h-3.5 w-3.5 text-card-foreground/60" />
+                            <MapPin className="mt-0.5 h-3.5 w-3.5 text-black/60" />
                             <span className="flex-1">
-                              <span className="block font-semibold text-foreground">{l.name}</span>
+                              <span className="block font-semibold text-black">{l.name}</span>
                               <span
                                 className="block text-[11px]"
                                 style={{ color: readinessColor(l.ready ? l.readinessScore : null) }}
@@ -923,10 +923,10 @@ ${planBlocks}
                         role="tab"
                         aria-selected={active}
                         onClick={() => setBodyTab(t.id)}
-                        className={`-mb-px rounded-t-md border-b-2 px-3 py-1.5 text-xs font-semibold transition-colors ${
+                        className={`-mb-px rounded-t-md border-b-2 px-3 py-1.5 text-xs font-semibold text-black transition-colors ${
                           active
-                            ? "border-black text-black"
-                            : "border-transparent text-black/60 hover:text-black"
+                            ? "border-black"
+                            : "border-transparent hover:border-black/40"
                         }`}
                       >
                         {t.label}
