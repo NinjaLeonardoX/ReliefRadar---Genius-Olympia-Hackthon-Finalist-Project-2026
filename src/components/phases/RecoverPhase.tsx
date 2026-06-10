@@ -176,6 +176,8 @@ export function RecoverPhase() {
   const [helpers, setHelpers] = useState<HelpPoint[]>(SEED_HELP);
   const [openForm, setOpenForm] = useState<null | "need" | "help" | "broadcast">(null);
   const [draftNeed, setDraftNeed] = useState<Omit<Need, "id" | "status"> | null>(null);
+  const [sending, setSending] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const householdLabel = activeAddress?.name ?? "Your household";
   const scopeLabel = resolved?.city
@@ -185,6 +187,62 @@ export function RecoverPhase() {
   const openCount = needs.filter((n) => n.status === "Posted").length;
   const matchedCount = needs.filter((n) => n.status === "Matched" || n.status === "In Progress").length;
   const completedCount = needs.filter((n) => n.status === "Completed").length;
+
+  async function postBeacon(channels: BroadcastChannel[]) {
+    if (!draftNeed) return;
+    setSending(true);
+    setToast(`Sending to ${channels.length} channel${channels.length === 1 ? "" : "s"}…`);
+    try {
+      // Mirror into IQ Engine state (localStorage) so the IQ broadcast log + beacons see it.
+      const id = `n${Date.now()}`;
+      const now = Date.now();
+
+      // 1. Add to IQ beacons list
+      try {
+        const rawB = window.localStorage.getItem("iq:beacons");
+        const list = rawB ? JSON.parse(rawB) : [];
+        const iqBeacon = {
+          id,
+          what: draftNeed.what,
+          where: draftNeed.where || scopeLabel,
+          urgency: draftNeed.urgency,
+          status: "Open",
+          createdAt: now,
+        };
+        window.localStorage.setItem("iq:beacons", JSON.stringify([iqBeacon, ...list]));
+      } catch {/* ignore */}
+
+      // 2. Log to IQ broadcast log
+      try {
+        const rawL = window.localStorage.getItem("iq:broadcasts");
+        const log = rawL ? JSON.parse(rawL) : [];
+        const entry = {
+          id: `bc${now}`,
+          origin: scopeLabel || "Recover phase",
+          destination: `${draftNeed.what}${draftNeed.where ? ` · ${draftNeed.where}` : ""}`,
+          rule: `Need Beacon · ${draftNeed.urgency}`,
+          score: draftNeed.urgency === "Urgent" ? 95 : draftNeed.urgency === "Soon" ? 75 : 55,
+          sentAt: now,
+          recipients: channels.length,
+        };
+        window.localStorage.setItem("iq:broadcasts", JSON.stringify([entry, ...log].slice(0, 20)));
+      } catch {/* ignore */}
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      setNeeds((prev) => [
+        { ...draftNeed, id, status: "Posted", channels },
+        ...prev,
+      ]);
+      setToast(`Posted to ${channels.length} channel${channels.length === 1 ? "" : "s"}. Logged in IQ Engine.`);
+      setTimeout(() => setToast(null), 3500);
+    } finally {
+      setSending(false);
+      setDraftNeed(null);
+      setOpenForm(null);
+    }
+  }
+
 
   return (
     <div className="space-y-6">
