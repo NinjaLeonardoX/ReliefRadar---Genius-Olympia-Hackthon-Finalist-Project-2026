@@ -729,16 +729,25 @@ ${planBlocks}
             </p>
           </div>
         ) : (
-          <div className="mb-4 rounded-xl border border-[color:var(--severity-moderate)]/40 bg-[color:var(--severity-moderate)]/5 p-4">
-            <p className="text-sm font-semibold text-foreground">
-              Answer a few readiness questions so DisasterCompass can build your Compass Plan.
+          <div className="mb-4">
+            <h3 className="text-xl font-bold tracking-tight">Set your safety location</h3>
+            <p className="mt-1 text-sm text-card-foreground/75">
+              Choose how to add your address so DisasterCompass can build your Compass Plan.
             </p>
-            <button
-              onClick={() => startReadinessForExisting(selected.id)}
-              className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:brightness-110"
-            >
-              Start readiness setup <ArrowRight className="h-3.5 w-3.5" />
-            </button>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={startDeviceFlow}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:brightness-110"
+              >
+                <LocateFixed className="h-4 w-4" /> Use My Location
+              </button>
+              <button
+                onClick={startManualFlow}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-xs font-semibold text-foreground hover:bg-surface"
+              >
+                <Pencil className="h-4 w-4" /> Enter Manually
+              </button>
+            </div>
           </div>
         )}
 
