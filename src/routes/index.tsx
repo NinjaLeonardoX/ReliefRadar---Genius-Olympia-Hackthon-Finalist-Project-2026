@@ -189,28 +189,6 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="mx-auto max-w-7xl px-6 pb-32">
-          <div className="relative overflow-hidden rounded-3xl border border-[#16A34A]/30 bg-[#16A34A]/[0.06] p-12 text-center sm:p-20">
-            <div className="absolute inset-0 -z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(22,163,74,0.18),transparent_60%)]" />
-            <div className="relative">
-              <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                See it before you need it.
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-white/70">
-                Open the live North Creek demo and walk through the first 60 minutes of a flood
-                event.
-              </p>
-              <Link
-                to="/compass"
-                className="group mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-4 text-sm font-semibold text-[#1e293b] shadow-2xl shadow-black/40 transition hover:bg-white/90"
-              >
-                Launch Compass Plan
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </Link>
-            </div>
-          </div>
-        </section>
 
         <footer className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 text-xs text-white/40 sm:flex-row">
