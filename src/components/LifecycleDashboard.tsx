@@ -43,6 +43,8 @@ export function LifecycleDashboard() {
           onSelect={() => setActivePhase("prepare")}
           visualClass="bg-[radial-gradient(circle_at_25%_20%,rgba(125,211,252,0.85),transparent_60%),radial-gradient(circle_at_85%_85%,rgba(14,116,144,0.9),transparent_55%),linear-gradient(135deg,#0c4a6e_0%,#0369a1_55%,#082f49_100%)]"
         />
+        )}
+        {(!activePhase || activePhase === "respond") && (
         <LifecycleCard
           phase="respond"
           when="DURING"
