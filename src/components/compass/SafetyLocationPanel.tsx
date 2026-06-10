@@ -23,6 +23,13 @@ import {
   XCircle,
   SkipForward,
   Sparkles,
+  Users,
+  UserRound,
+  Baby,
+  PawPrint,
+  Car,
+  Stethoscope,
+  Accessibility,
 } from "lucide-react";
 
 /**
