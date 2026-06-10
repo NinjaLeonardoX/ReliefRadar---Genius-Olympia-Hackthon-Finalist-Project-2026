@@ -1953,8 +1953,9 @@ function WizardStep(p: SetupModalProps) {
         </button>
       </div>
 
-      <ul className="space-y-2">
-        {section.questions.map((q) => {
+      {(() => {
+        const isHazard = section.id !== "base";
+        const renderRow = (q: Question) => {
           const v = sectionAnswers[q.key];
           return (
             <li key={q.key} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface/30 px-3 py-2">
@@ -1983,8 +1984,31 @@ function WizardStep(p: SetupModalProps) {
               </div>
             </li>
           );
-        })}
-      </ul>
+        };
+
+        if (!isHazard) {
+          return <ul className="space-y-2">{section.questions.map(renderRow)}</ul>;
+        }
+
+        const cats: QuestionCategory[] = ["know", "equip", "mental"];
+        return (
+          <div className="space-y-3">
+            {cats.map((cat) => {
+              const qs = section.questions.filter((q) => q.category === cat);
+              if (qs.length === 0) return null;
+              return (
+                <div key={cat} className="rounded-xl border border-border bg-surface/20 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-card-foreground/55">
+                    {CATEGORY_META[cat].label}
+                  </p>
+                  <p className="text-[11px] text-card-foreground/55">{CATEGORY_META[cat].blurb}</p>
+                  <ul className="mt-2 space-y-2">{qs.map(renderRow)}</ul>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       <div className="flex items-center justify-between gap-2 pt-2">
         <button
