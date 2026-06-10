@@ -584,10 +584,13 @@ export function SafetyLocationPanel() {
   const [draftName, setDraftName] = useState("Home");
   const [draftType, setDraftType] = useState("Home");
   const [draftArea, setDraftArea] = useState("");
+  const [draftGeo, setDraftGeo] = useState<GeocodeResult | null>(null);
   const [draftLocationId, setDraftLocationId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<AllAnswers>(blankAnswers());
   const [skipped, setSkipped] = useState<SkipMap>(blankSkipped());
   const [wizardIndex, setWizardIndex] = useState(0); // 0..SECTIONS.length-1
+  const [genProgress, setGenProgress] = useState(0);
+  const [genStatus, setGenStatus] = useState<string>("");
 
   const [selectedDisaster, setSelectedDisaster] = useState<Disaster>("flood");
   const [bodyTab, setBodyTab] = useState<"overview" | "people" | "risk" | "routes" | "gaps">("overview");
