@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Phase = "prepare" | "respond" | "recover";
 export type Mode = "resident" | "community";
@@ -12,9 +12,55 @@ interface PhaseContextValue {
 
 const PhaseContext = createContext<PhaseContextValue | null>(null);
 
+const PHASE_KEY = "dc.activePhase";
+const MODE_KEY = "dc.mode";
+
+function isPhase(v: unknown): v is Phase {
+  return v === "prepare" || v === "respond" || v === "recover";
+}
+function isMode(v: unknown): v is Mode {
+  return v === "resident" || v === "community";
+}
+
 export function PhaseProvider({ children }: { children: ReactNode }) {
-  const [activePhase, setActivePhase] = useState<Phase>("respond");
-  const [mode, setMode] = useState<Mode>("resident");
+  // Always start with the SSR default to avoid hydration mismatch.
+  const [activePhase, setActivePhaseState] = useState<Phase>("respond");
+  const [mode, setModeState] = useState<Mode>("resident");
+  const [hydrated, setHydrated] = useState(false);
+
+  // After mount, restore from sessionStorage.
+  useEffect(() => {
+    try {
+      const p = sessionStorage.getItem(PHASE_KEY);
+      if (isPhase(p)) setActivePhaseState(p);
+      const m = sessionStorage.getItem(MODE_KEY);
+      if (isMode(m)) setModeState(m);
+    } catch {
+      /* ignore */
+    }
+    setHydrated(true);
+  }, []);
+
+  const setActivePhase = (p: Phase) => {
+    setActivePhaseState(p);
+    try {
+      sessionStorage.setItem(PHASE_KEY, p);
+    } catch {
+      /* ignore */
+    }
+  };
+  const setMode = (m: Mode) => {
+    setModeState(m);
+    try {
+      sessionStorage.setItem(MODE_KEY, m);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // Avoid passing hydrated through context — just use values.
+  void hydrated;
+
   return (
     <PhaseContext.Provider value={{ activePhase, setActivePhase, mode, setMode }}>
       {children}
