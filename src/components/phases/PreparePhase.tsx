@@ -176,7 +176,7 @@ export function PreparePhase() {
           </h3>
           <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
             Readiness for{" "}
-            <span className="font-semibold text-card-foreground">{scopeMeta.place}</span> —{" "}
+            <span className="font-semibold text-card-foreground">{scopePlaceLabel}</span> —{" "}
             {scopeMeta.blurb}
           </p>
         </div>
