@@ -980,20 +980,21 @@ function SetupModal(p: SetupModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={p.onCancel}>
       <div
-        className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl border border-border bg-card shadow-2xl"
+        className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl border border-border bg-white text-black shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-card-foreground/55">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black">
               {p.mode === "device" ? "Use My Location" : "Enter Manually"} · Readiness Onboarding
             </p>
-            <p className="text-sm font-semibold">{stepLabel}</p>
+            <p className="text-sm font-semibold text-black">{stepLabel}</p>
           </div>
-          <button onClick={p.onCancel} className="rounded-md p-1 text-card-foreground/60 hover:bg-surface">
+          <button onClick={p.onCancel} className="rounded-md p-1 text-black hover:bg-gray-100">
             <X className="h-4 w-4" />
           </button>
         </div>
+
 
         {/* Progress bar */}
         {p.step !== "name" && <ProgressBar step={p.step} wizardIndex={p.wizardIndex} totalSteps={totalSteps} />}
