@@ -1053,10 +1053,12 @@ function redactForPublic(text: string): string {
 
 function BroadcastBeacon({
   draft,
+  sending,
   onCancel,
   onPost,
 }: {
   draft: Omit<Need, "id" | "status">;
+  sending: boolean;
   onCancel: () => void;
   onPost: (channels: BroadcastChannel[]) => void;
 }) {
