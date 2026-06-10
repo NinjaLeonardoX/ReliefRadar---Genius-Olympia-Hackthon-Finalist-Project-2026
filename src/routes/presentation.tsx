@@ -38,6 +38,8 @@ type Slide = {
   cover?: boolean;
   kicker?: string;
   tagline?: string;
+  presenters?: string[];
+  team?: string;
   lead?: string;
   stats?: { value: string; label: string }[];
   note?: string;
@@ -61,6 +63,8 @@ const slides: Slide[] = [
     kicker: "Prepare · Respond · Recover",
     title: "Calm decisions in the first 60 minutes.",
     tagline: "A Community Disaster Action Planner — go, stay, or wait, with the safest route.",
+    presenters: ["William Riano", "Miguel Riano Jr"],
+    team: "Team 8934",
   },
   // 1 — Context
   {
@@ -120,12 +124,8 @@ const slides: Slide[] = [
           items: ["Action engine", "Route scoring", "Volunteer matching", "Recovery steps"],
         },
         {
-          label: "Backend & data",
-          items: ["Supabase (Postgres · Auth)", "Seed data (North Creek)"],
-        },
-        {
-          label: "Live signals",
-          items: ["NOAA / NWS alerts", "Weather & routing APIs", "Fallback-guarded"],
+          label: "Real-time data",
+          items: ["MapTiler (maps)", "OpenWeatherMap API", "Web scrape via Lovable"],
         },
       ],
       tooling: ["Vite", "Bun", "ESLint", "Prettier"],
@@ -179,7 +179,7 @@ const slides: Slide[] = [
       { name: "Claude (Claude Code)", use: "Code generation and implementation" },
       { name: "Lovable", use: "Full-stack app scaffolding and hosting" },
       { name: "Gamma", use: "Presentation design support" },
-      { name: "FlowScholar", use: "Research and source-finding" },
+      { name: "FlowScholar", use: "Task management and strategy" },
     ],
     note: "AI accelerated the build, but the rules engine stays deterministic and human-reviewed: AI explains, rules decide, humans approve.",
   },
@@ -187,9 +187,11 @@ const slides: Slide[] = [
   {
     cover: true,
     eyebrow: "",
-    kicker: "Thank you",
-    title: "We turn official information into local action.",
-    tagline: "Disaster Compass · Community Disaster Action Planner",
+    kicker: "Disaster Compass",
+    title: "Thank you.",
+    tagline: "We turn official information into local action.",
+    presenters: ["William Riano", "Miguel Riano Jr"],
+    team: "Team 8934",
   },
 ];
 
@@ -226,6 +228,22 @@ function SlideView({ slide, index, total }: { slide: Slide; index: number; total
           </h2>
           {slide.tagline && (
             <p className="mt-5 max-w-xl text-base text-white/70 sm:text-lg">{slide.tagline}</p>
+          )}
+
+          {slide.presenters && (
+            <div className="mt-9 border-t border-white/10 pt-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                Developers
+              </p>
+              <p className="mt-2 text-base font-semibold text-white sm:text-lg">
+                {slide.presenters.join("  ·  ")}
+              </p>
+              {slide.team && (
+                <p className="mt-1 text-sm font-semibold uppercase tracking-[0.22em] text-[#5EE6A1]">
+                  {slide.team}
+                </p>
+              )}
+            </div>
           )}
         </div>
 
