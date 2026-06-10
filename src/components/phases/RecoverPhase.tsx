@@ -46,7 +46,16 @@ import {
 import { useLocation } from "../LocationContext";
 
 
-type Status = "Open" | "Matched" | "In Progress" | "Completed";
+type Status = "Draft" | "Posted" | "Matched" | "In Progress" | "Completed";
+
+type BroadcastChannel =
+  | "board"
+  | "volunteers"
+  | "partners"
+  | "website"
+  | "sms"
+  | "social"
+  | "print";
 
 type Need = {
   id: string;
@@ -56,6 +65,7 @@ type Need = {
   vulnerable?: string;
   status: Status;
   helper?: string;
+  channels?: BroadcastChannel[];
 };
 
 type HelpPoint = {
