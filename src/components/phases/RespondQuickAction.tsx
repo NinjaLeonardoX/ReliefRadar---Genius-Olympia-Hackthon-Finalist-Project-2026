@@ -6,6 +6,7 @@ import { useLocation } from "../LocationContext";
 import { useRoutes, resolveDestinationShelter } from "@/lib/queries/routing";
 import { SHELTERS } from "@/data/seed";
 import type { Shelter } from "@/types";
+import { readSOSRecipient, formatSOSRecipient } from "@/routes/iq";
 
 // Haversine distance in km between two [lat, lng] points.
 function distanceKm(a: [number, number], b: [number, number]): number {
