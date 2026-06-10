@@ -122,23 +122,20 @@ export function LifecycleDashboard() {
 /** The rollup-scale lens (Household → National), in the page content (not the nav). */
 function ScopeSelector() {
   const { scope, setScope } = usePhase();
-  const { activeAddress, resolved, source } = useLocation();
+  const { activeAddress, resolved } = useLocation();
 
-  const placeFor = (id: ReadinessScope, fallback: string): string => {
-    if (source === "seed") return fallback;
+  const placeFor = (id: ReadinessScope): string => {
     switch (id) {
       case "household":
-        return activeAddress?.name ?? "Your household";
+        return activeAddress?.name ?? "Set address";
       case "community":
-        return resolved?.city
-          ? `near ${resolved.city}`
-          : "your area";
+        return resolved?.city ? `near ${resolved.city}` : "Set address";
       case "town":
-        return resolved?.city ?? resolved?.county ?? fallback;
+        return resolved?.city ?? resolved?.county ?? "Set address";
       case "state":
-        return resolved?.state ?? resolved?.stateCode ?? fallback;
+        return resolved?.state ?? resolved?.stateCode ?? "Set address";
       case "national":
-        return resolved?.country ?? fallback;
+        return resolved?.country ?? "Set address";
     }
   };
 
@@ -150,7 +147,6 @@ function ScopeSelector() {
     >
       {SCOPE_META.map((s) => {
         const active = scope === s.id;
-        const place = placeFor(s.id, s.place);
         return (
           <button
             key={s.id}
@@ -168,7 +164,7 @@ function ScopeSelector() {
             <span
               className={`block text-[10px] leading-tight ${active ? "text-white/75" : "text-card-foreground/50"}`}
             >
-              {place}
+              {placeFor(s.id)}
             </span>
           </button>
         );
@@ -176,7 +172,6 @@ function ScopeSelector() {
     </div>
   );
 }
-
 
 interface SnapshotSummary {
   ring: number;
