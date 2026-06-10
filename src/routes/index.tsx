@@ -47,7 +47,7 @@ function LandingPage() {
 
         {/* HERO */}
         <section className="mx-auto max-w-7xl px-6 pt-12 pb-4 lg:pt-20 lg:pb-6">
-          <div className="grid items-start gap-14 lg:grid-cols-12">
+          <div className="grid items-stretch gap-14 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <div className="road-badge relative inline-flex items-center gap-2.5 rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/95">
                 <svg className="road-border-svg" aria-hidden xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
