@@ -1,13 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  Compass,
-  Map as MapIcon,
-  Gauge,
-  HandHeart,
-  ShieldCheck,
-  LifeBuoy,
-  Info,
-} from "lucide-react";
+import { Radar, Compass as CompassIcon, LifeBuoy, BookOpen, Info } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,30 +12,25 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { DemoScenarioDropdown, type DemoScenario } from "./DemoScenarioDropdown";
 import dcLogo from "@/assets/disaster-compass-logo.png.asset.json";
+import { usePhase, type Phase } from "./PhaseContext";
 
+const PHASES: { id: Phase; label: string; sub: string; Icon: typeof Radar }[] = [
+  { id: "prepare", label: "Prepare", sub: "Readiness Radar", Icon: Radar },
+  { id: "respond", label: "Respond", sub: "Compass Action Plan", Icon: CompassIcon },
+  { id: "recover", label: "Recover", sub: "Recovery Launchpad", Icon: LifeBuoy },
+];
 
-
-interface AppSidebarProps {
-  activeScenario: string | null;
-  onSelectScenario: (s: DemoScenario) => void;
-}
-
-const NAV = [
-  { to: "/compass", label: "Compass Plan", Icon: Compass },
-  { to: "/compass#map", label: "Safe Route Map", Icon: MapIcon },
-  { to: "/compass#scores", label: "Route Scores", Icon: Gauge },
-  { to: "/compass#volunteer", label: "Volunteer Match", Icon: HandHeart },
-  { to: "/compass#coordinator", label: "Coordinator View", Icon: ShieldCheck },
-  { to: "/compass#recovery", label: "Recovery Steps", Icon: LifeBuoy },
+const REFS = [
+  { to: "/methodology", label: "Methodology", Icon: BookOpen },
   { to: "/ai-disclosure", label: "AI Disclosure", Icon: Info },
 ] as const;
 
-export function AppSidebar({ activeScenario, onSelectScenario }: AppSidebarProps) {
+export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { activePhase, setActivePhase, mode, setMode } = usePhase();
 
   return (
     <Sidebar
@@ -60,35 +47,72 @@ export function AppSidebar({ activeScenario, onSelectScenario }: AppSidebarProps
         </Link>
       </SidebarHeader>
 
-
-
       <SidebarContent className="bg-[color:var(--surface)]">
+        {/* Mode toggle */}
+        {!collapsed && (
+          <div className="px-3 pt-3">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Mode
+            </p>
+            <div className="flex rounded-lg bg-white/5 p-0.5 ring-1 ring-white/10">
+              {(["resident", "community"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className={[
+                    "flex-1 rounded-md px-2 py-1.5 text-[11px] font-semibold capitalize transition-colors",
+                    mode === m
+                      ? "bg-[color:var(--severity-low)] text-white shadow-sm"
+                      : "text-slate-300 hover:text-white",
+                  ].join(" ")}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {NAV.map(({ to, label, Icon }) => {
-                const active = pathname + (typeof window !== "undefined" ? window.location.hash : "") === to
-                  || (to === "/compass" && pathname === "/compass");
+              {PHASES.map(({ id, label, sub, Icon }) => {
+                const active = activePhase === id && pathname === "/compass";
                 return (
-                  <SidebarMenuItem key={label}>
+                  <SidebarMenuItem key={id}>
                     <SidebarMenuButton
                       asChild
-                      tooltip={label}
+                      tooltip={`${label} — ${sub}`}
                       className={[
-                        "group/nav my-0.5 rounded-lg text-slate-300 hover:bg-white/8 hover:text-white data-[active=true]:bg-white/10 data-[active=true]:text-white",
-                        active ? "relative bg-white/10 text-white shadow-[inset_3px_0_0_0_var(--severity-low),0_0_24px_-12px_rgba(22,163,74,0.55)]" : "",
+                        "group/nav my-1 h-auto rounded-lg py-2.5 text-slate-300 hover:bg-white/8 hover:text-white",
+                        active
+                          ? "relative bg-white/10 text-white shadow-[inset_3px_0_0_0_var(--severity-low),0_0_24px_-12px_rgba(22,163,74,0.55)]"
+                          : "",
                       ].join(" ")}
                       data-active={active}
                     >
-                      <Link to={to} className="flex items-center gap-2.5">
+                      <Link
+                        to="/compass"
+                        onClick={() => setActivePhase(id)}
+                        className="flex items-start gap-2.5"
+                      >
                         <Icon
                           className={[
-                            "h-4 w-4 shrink-0",
-                            active ? "text-[color:var(--severity-low)]" : "text-slate-400 group-hover/nav:text-white",
+                            "mt-0.5 h-4 w-4 shrink-0",
+                            active
+                              ? "text-[color:var(--severity-low)]"
+                              : "text-slate-400 group-hover/nav:text-white",
                           ].join(" ")}
                           aria-hidden="true"
                         />
-                        {!collapsed && <span className="truncate text-sm font-medium">{label}</span>}
+                        {!collapsed && (
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold leading-tight">{label}</p>
+                            <p className="truncate text-[11px] text-slate-400 group-hover/nav:text-slate-200">
+                              {sub}
+                            </p>
+                          </div>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -99,18 +123,29 @@ export function AppSidebar({ activeScenario, onSelectScenario }: AppSidebarProps
         </SidebarGroup>
       </SidebarContent>
 
-      {!collapsed && (
-        <SidebarFooter className="border-t border-white/10 bg-[color:var(--surface)]">
-          <div className="space-y-2 p-1 text-slate-200">
-            <DemoScenarioDropdown onSelect={onSelectScenario} />
-            {activeScenario && (
-              <p className="text-[11px] text-slate-300">
-                Active: <span className="font-semibold text-[color:var(--severity-low)]">{activeScenario}</span>
-              </p>
-            )}
-          </div>
-        </SidebarFooter>
-      )}
+      <SidebarFooter className="border-t border-white/10 bg-[color:var(--surface)]">
+        {!collapsed && (
+          <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            Reference
+          </p>
+        )}
+        <SidebarMenu>
+          {REFS.map(({ to, label, Icon }) => (
+            <SidebarMenuItem key={to}>
+              <SidebarMenuButton
+                asChild
+                tooltip={label}
+                className="my-0.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white"
+              >
+                <Link to={to} className="flex items-center gap-2.5">
+                  <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  {!collapsed && <span className="truncate text-xs">{label}</span>}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
