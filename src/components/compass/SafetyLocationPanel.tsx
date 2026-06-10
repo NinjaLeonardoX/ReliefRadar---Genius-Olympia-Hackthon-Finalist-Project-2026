@@ -146,72 +146,102 @@ const SECTIONS: Section[] = [
     id: "flood",
     title: "Flood Readiness",
     questions: [
-      { key: "higher", q: "Do you know your nearest higher-ground location?", gap: "Higher-ground destination not confirmed" },
-      { key: "avoid", q: "Do you know which roads, bridges, or underpasses to avoid?", gap: "Flood-avoid roads not mapped" },
-      { key: "route", q: "Do you have a route that avoids low areas?", gap: "Flood-safe route not confirmed" },
-      { key: "transport", q: "Is transportation arranged if you must leave?", gap: "No transportation arranged" },
-      { key: "blocked", q: "Do you know what to do if water blocks your route?", gap: "No backup plan if route is blocked" },
-      { key: "bag", q: "Is your go-bag ready to leave quickly?", gap: "Go-bag not ready" },
+      // Do you know (3)
+      { category: "know", key: "higher", q: "Do you know your nearest higher-ground location?", gap: "Higher-ground destination not confirmed" },
+      { category: "know", key: "avoid", q: "Do you know which roads, bridges, or underpasses to avoid?", gap: "Flood-avoid roads not mapped" },
+      { category: "know", key: "blocked", q: "Do you know what to do if water blocks your route?", gap: "No backup plan if route is blocked" },
+      // Physical & Equipment (3)
+      { category: "equip", key: "bag", q: "Is a go-bag packed and ready to leave quickly?", gap: "Go-bag not ready" },
+      { category: "equip", key: "flashlight", q: "Do you have a waterproof flashlight and spare batteries?", gap: "Flashlight/batteries not ready" },
+      { category: "equip", key: "supplies", q: "Do you have 3 days of drinking water and food on hand?", gap: "3-day water/food supply missing" },
+      // Mental Preparedness (2)
+      { category: "mental", key: "drill", q: "Has everyone walked through the flood route together?", gap: "Flood route not rehearsed" },
+      { category: "mental", key: "meetup", q: "Is there an agreed family meet-up point if you get separated?", gap: "Family meet-up point not set" },
     ],
   },
   {
     id: "earthquake",
     title: "Earthquake Readiness",
     questions: [
-      { key: "drop", q: "Has everyone practiced Drop, Cover, and Hold On?", gap: "Drop/Cover/Hold not practiced" },
-      { key: "indoor", q: "Do you know where to shelter indoors?", gap: "Indoor shelter spot not chosen" },
-      { key: "assembly", q: "Do you know the outdoor assembly point after shaking stops?", gap: "Assembly area not confirmed" },
-      { key: "avoid", q: "Do you know what areas to avoid after shaking?", gap: "Post-shaking avoid zones unclear" },
-      { key: "contacts", q: "Are emergency contacts printed?", gap: "Emergency contacts not printed" },
-      { key: "bag", q: "Is the go-bag accessible after shaking?", gap: "Go-bag not accessible" },
+      // Know
+      { category: "know", key: "drop", q: "Do you know to Drop, Cover, and Hold On the moment shaking starts?", gap: "Drop/Cover/Hold not learned" },
+      { category: "know", key: "indoor", q: "Do you know where to shelter indoors (away from windows / heavy items)?", gap: "Indoor shelter spot not chosen" },
+      { category: "know", key: "assembly", q: "Do you know the outdoor assembly point once shaking stops?", gap: "Assembly area not confirmed" },
+      // Equip
+      { category: "equip", key: "bag", q: "Is the go-bag stored where you can reach it after shaking?", gap: "Go-bag not accessible" },
+      { category: "equip", key: "shoes", q: "Are sturdy shoes and a flashlight kept beside each bed?", gap: "Shoes/flashlight by bed missing" },
+      { category: "equip", key: "supplies", q: "Do you have one week of water and non-perishable food?", gap: "1-week water/food supply missing" },
+      // Mental
+      { category: "mental", key: "drill", q: "Has the household rehearsed the plan in the last 6 months?", gap: "Earthquake drill not practiced" },
+      { category: "mental", key: "contact", q: "Is an out-of-area contact agreed for check-ins after shaking?", gap: "Out-of-area contact not set" },
     ],
   },
   {
     id: "heat",
     title: "Extreme Heat Readiness",
     questions: [
-      { key: "cooling", q: "Do you know your nearest cooling center?", gap: "Cooling center not confirmed" },
-      { key: "backup", q: "Do you have a backup cooling plan if power fails?", gap: "Backup cooling plan missing" },
-      { key: "water", q: "Is water available for the household/group?", gap: "Water supply not confirmed" },
-      { key: "risk", q: "Are elderly, children, or medical-risk people identified?", gap: "Medical-risk people not identified" },
-      { key: "charging", q: "Do you have a charging plan for phones or medical devices?", gap: "Charging plan missing" },
-      { key: "transport", q: "Is transport arranged if cooling is needed?", gap: "Cooling transport not arranged" },
+      // Know
+      { category: "know", key: "cooling", q: "Do you know your nearest cooling center?", gap: "Cooling center not confirmed" },
+      { category: "know", key: "risk", q: "Have you identified elderly, children, or medical-risk people in the household?", gap: "Heat-risk people not identified" },
+      { category: "know", key: "signs", q: "Can you recognize heat-exhaustion warning signs?", gap: "Heat-exhaustion signs unknown" },
+      // Equip
+      { category: "equip", key: "water", q: "Do you have at least 3 days of drinking water on hand?", gap: "Drinking water supply missing" },
+      { category: "equip", key: "backup", q: "Do you have battery fans, cool packs, or wet towels as backup cooling?", gap: "Backup cooling kit missing" },
+      { category: "equip", key: "charging", q: "Do you have a charging plan for phones and medical devices?", gap: "Charging plan missing" },
+      // Mental
+      { category: "mental", key: "buddy", q: "Is there a twice-a-day check-in with at-risk household members?", gap: "Heat buddy check-in not set" },
+      { category: "mental", key: "pacing", q: "Have you planned to avoid outdoor activity between 11am and 4pm?", gap: "Midday pacing plan missing" },
     ],
   },
   {
     id: "hurricane",
     title: "Hurricane Readiness",
     questions: [
-      { key: "route", q: "Do you know your evacuation or shelter route?", gap: "Shelter route not confirmed" },
-      { key: "stay", q: "Do you know where to shelter if you stay?", gap: "Stay-in-place shelter not chosen" },
-      { key: "pets", q: "Is the shelter pet/accessibility compatible?", gap: "Pet/accessibility shelter fit not confirmed" },
-      { key: "transport", q: "Is transportation arranged before roads fill?", gap: "Transportation not arranged" },
-      { key: "bag", q: "Is your go-bag ready for several days?", gap: "Multi-day go-bag not ready" },
-      { key: "contact", q: "Do you know who to contact if separated?", gap: "Contact plan missing" },
+      // Know
+      { category: "know", key: "route", q: "Do you know your evacuation or shelter route?", gap: "Shelter route not confirmed" },
+      { category: "know", key: "stay", q: "Do you know where to shelter if you stay (interior, no windows)?", gap: "Stay-in-place shelter not chosen" },
+      { category: "know", key: "deadline", q: "Do you know the evacuation deadline and where to get official updates?", gap: "Evacuation deadline / channels unknown" },
+      // Equip
+      { category: "equip", key: "bag", q: "Is a multi-day go-bag ready (clothes, meds, documents)?", gap: "Multi-day go-bag not ready" },
+      { category: "equip", key: "supplies", q: "Do you have 3+ days of food, water, batteries, and medications?", gap: "3-day supplies missing" },
+      { category: "equip", key: "windows", q: "Are windows protected, or is an interior safe room prepared?", gap: "Window/safe-room prep missing" },
+      // Mental
+      { category: "mental", key: "contact", q: "Is there a contact plan if the household is separated?", gap: "Contact plan missing" },
+      { category: "mental", key: "drill", q: "Has the household walked through the hurricane plan together?", gap: "Hurricane plan not rehearsed" },
     ],
   },
   {
     id: "wildfire",
     title: "Wildfire Readiness",
     questions: [
-      { key: "primary", q: "Do you know your primary exit route?", gap: "Primary exit not confirmed" },
-      { key: "backup", q: "Do you know your backup exit route?", gap: "Backup route not confirmed" },
-      { key: "bag", q: "Is your go-bag ready?", gap: "Go-bag not ready" },
-      { key: "wind", q: "Do you know what direction to avoid if fire or smoke spreads?", gap: "Smoke-avoid direction unclear" },
-      { key: "transport", q: "Is transportation ready?", gap: "Transportation not ready" },
-      { key: "items", q: "Are pets, medications, and documents ready to move quickly?", gap: "Pet/medication/document plan missing" },
+      // Know
+      { category: "know", key: "primary", q: "Do you know your primary exit route?", gap: "Primary exit not confirmed" },
+      { category: "know", key: "backup", q: "Do you know your backup exit route?", gap: "Backup route not confirmed" },
+      { category: "know", key: "wind", q: "Do you know what direction to avoid if fire or smoke spreads?", gap: "Smoke-avoid direction unclear" },
+      // Equip
+      { category: "equip", key: "bag", q: "Is a go-bag ready (including pets, medications, and documents)?", gap: "Go-bag not ready" },
+      { category: "equip", key: "masks", q: "Do you have N95 (or equivalent) masks for smoke?", gap: "Smoke masks missing" },
+      { category: "equip", key: "defensible", q: "Is the yard cleared of dry brush and debris near the structure?", gap: "Defensible space not cleared" },
+      // Mental
+      { category: "mental", key: "drill", q: "Have you practiced evacuating in under 10 minutes?", gap: "Quick-evacuation drill not done" },
+      { category: "mental", key: "contact", q: "Is an out-of-area contact and meet point agreed?", gap: "Out-of-area contact missing" },
     ],
   },
   {
     id: "winter",
     title: "Winter Storm Readiness",
     questions: [
-      { key: "warming", q: "Do you know your nearest warming center?", gap: "Warming center not confirmed" },
-      { key: "heat", q: "Do you have a backup heat plan if power fails?", gap: "Backup heat plan missing" },
-      { key: "supplies", q: "Do you have food, water, and medications for several days?", gap: "Food/water/medicine supply not confirmed" },
-      { key: "charging", q: "Do you have a phone or medical-device charging plan?", gap: "Charging plan missing" },
-      { key: "roads", q: "Do you know which icy roads, bridges, or steep routes to avoid?", gap: "Winter-safe route not confirmed" },
-      { key: "transport", q: "Is transportation arranged if you must go to a warming center?", gap: "Warming-center transport not arranged" },
+      // Know
+      { category: "know", key: "warming", q: "Do you know your nearest warming center?", gap: "Warming center not confirmed" },
+      { category: "know", key: "roads", q: "Do you know which icy roads, bridges, or steep routes to avoid?", gap: "Winter-safe route not confirmed" },
+      { category: "know", key: "signs", q: "Can you recognize hypothermia and frostbite warning signs?", gap: "Hypothermia/frostbite signs unknown" },
+      // Equip
+      { category: "equip", key: "heat", q: "Do you have a backup heat plan if power fails?", gap: "Backup heat plan missing" },
+      { category: "equip", key: "supplies", q: "Do you have multi-day food, water, and medications?", gap: "Multi-day supplies missing" },
+      { category: "equip", key: "light", q: "Do you have flashlights, a lantern, and spare batteries?", gap: "Flashlights/batteries missing" },
+      // Mental
+      { category: "mental", key: "drill", q: "Does the household know how to layer clothing and stay warm together?", gap: "Warmth plan not rehearsed" },
+      { category: "mental", key: "check", q: "Is there a plan to check on neighbors and at-risk household members?", gap: "Neighbor check-in plan missing" },
     ],
   },
 ];
