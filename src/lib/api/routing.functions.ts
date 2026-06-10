@@ -48,6 +48,9 @@ export const fetchRoutes = createServerFn({ method: "POST" })
       throw new Error("ORS_API_KEY not configured");
     }
 
+    // NOTE: ORS rejects `alternative_routes` when combined with
+    // `avoid_polygons` (HTTP 400). Request a single avoidance-aware route;
+    // the adapter merges it onto the seed alternatives.
     const res = await fetch("https://api.openrouteservice.org/v2/directions/driving-car/geojson", {
       method: "POST",
       headers: {
@@ -56,8 +59,6 @@ export const fetchRoutes = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         coordinates: [data.start, data.dest],
-        // Up to 3 alternatives so each can be matched to a seed route.
-        alternative_routes: { target_count: 3, share_factor: 0.6, weight_factor: 1.6 },
         options: {
           avoid_polygons: {
             type: "Polygon",
@@ -68,6 +69,8 @@ export const fetchRoutes = createServerFn({ method: "POST" })
     });
 
     if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.info(`[routing] ORS ${res.status} — falling back to seed routes.`, body);
       throw new Error(`ORS request failed: ${res.status}`);
     }
     return (await res.json()) as OrsResponse;
