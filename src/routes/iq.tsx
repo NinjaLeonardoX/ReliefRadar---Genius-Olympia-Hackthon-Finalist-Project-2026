@@ -210,6 +210,8 @@ function IQEnginePage() {
         <VolunteersPanel volunteers={volunteers} setVolunteers={setVolunteers} />
       </div>
 
+      <SOSRecipientPanel />
+
       <BroadcastsPanel broadcasts={broadcasts} setBroadcasts={setBroadcasts} />
     </main>
   );
@@ -834,6 +836,108 @@ function BroadcastsPanel({
         ))}
         {broadcasts.length === 0 && <li className="rounded-lg border border-dashed border-border p-3 text-center text-xs text-card-foreground/55">No broadcasts yet.</li>}
       </ul>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOS recipient configuration
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type SOSRecipient = { title: string; name: string; organization: string };
+
+export const DEFAULT_SOS_RECIPIENT: SOSRecipient = {
+  title: "Chief",
+  name: "Milo",
+  organization: "Firestation 80",
+};
+
+export function readSOSRecipient(): SOSRecipient {
+  try {
+    const raw = window.localStorage.getItem("iq:sosRecipient");
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<SOSRecipient>;
+      return {
+        title: parsed.title?.trim() || DEFAULT_SOS_RECIPIENT.title,
+        name: parsed.name?.trim() || DEFAULT_SOS_RECIPIENT.name,
+        organization: parsed.organization?.trim() || DEFAULT_SOS_RECIPIENT.organization,
+      };
+    }
+  } catch {
+    /* ignore */
+  }
+  return DEFAULT_SOS_RECIPIENT;
+}
+
+export function formatSOSRecipient(r: SOSRecipient): string {
+  return `${r.title} ${r.name} of ${r.organization}`.replace(/\s+/g, " ").trim();
+}
+
+function SOSRecipientPanel() {
+  const [recipient, setRecipient] = useLocalState<SOSRecipient>("iq:sosRecipient", DEFAULT_SOS_RECIPIENT);
+  const [saved, setSaved] = useState(false);
+
+  function update<K extends keyof SOSRecipient>(key: K, value: SOSRecipient[K]) {
+    setRecipient({ ...recipient, [key]: value });
+    setSaved(false);
+  }
+
+  return (
+    <section className="dc-card p-5">
+      <div className="flex items-center gap-2">
+        <Siren className="h-4 w-4 text-[color:var(--severity-critical)]" />
+        <h3 className="text-sm font-bold uppercase tracking-wider">SOS recipient</h3>
+      </div>
+      <p className="mt-1 text-xs text-card-foreground/65">
+        When someone taps <span className="font-semibold">Send SOS</span> in Respond, the confirmation will read
+        "Sent to {formatSOSRecipient(recipient)}".
+      </p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/60">
+          Title / Designation
+          <input
+            value={recipient.title}
+            onChange={(e) => update("title", e.target.value)}
+            placeholder="Chief"
+            className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-normal normal-case tracking-normal text-foreground"
+          />
+        </label>
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/60">
+          Name
+          <input
+            value={recipient.name}
+            onChange={(e) => update("name", e.target.value)}
+            placeholder="Milo"
+            className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-normal normal-case tracking-normal text-foreground"
+          />
+        </label>
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-card-foreground/60">
+          Organization
+          <input
+            value={recipient.organization}
+            onChange={(e) => update("organization", e.target.value)}
+            placeholder="Firestation 80"
+            className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-normal normal-case tracking-normal text-foreground"
+          />
+        </label>
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <p className="text-xs text-card-foreground/70">
+          Preview: <span className="font-semibold text-foreground">Sent to {formatSOSRecipient(recipient)}</span>
+        </p>
+        <button
+          type="button"
+          onClick={() => setSaved(true)}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[color:var(--severity-critical)] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110"
+        >
+          <Save className="h-3.5 w-3.5" /> Save
+        </button>
+      </div>
+      {saved && (
+        <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--severity-low)]">
+          <CheckCircle2 className="h-3.5 w-3.5" /> Saved — SOS confirmations will use this recipient.
+        </p>
+      )}
     </section>
   );
 }
