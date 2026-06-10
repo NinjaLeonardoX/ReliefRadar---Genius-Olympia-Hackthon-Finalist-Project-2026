@@ -4,7 +4,9 @@ import { MapPanel } from "../compass/MapPanel";
 import { WeatherCard } from "../WeatherCard";
 import { useLocation } from "../LocationContext";
 import { useEvacuationRoutes } from "@/lib/queries/evacuation";
+import { fetchAlertsByPoint } from "@/lib/nwsAlerts";
 import { readSOSRecipient, formatSOSMessage } from "@/routes/iq";
+
 
 
 
@@ -68,6 +70,22 @@ export function RespondQuickAction() {
   // a line, regardless of how far the user is from the seed scenario.
   const { routes, destinations } = useEvacuationRoutes(home, "flood", true);
 
+  // Active alert event from NWS for the user's location. Defaults to
+  // "Heat Wave" when no alert is active or the fetch fails.
+  const [alertEvent, setAlertEvent] = useState<string>("Heat Wave");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchAlertsByPoint(home[0], home[1], controller.signal)
+      .then((res) => {
+        const top = res?.alerts?.[0]?.event;
+        setAlertEvent(top && top !== "Unknown event" ? top : "Heat Wave");
+      })
+      .catch(() => setAlertEvent("Heat Wave"));
+    return () => controller.abort();
+  }, [home[0], home[1]]);
+
+
+
 
   const onAction = (a: ActionDef) => {
     setStatus(a.id);
@@ -95,12 +113,13 @@ export function RespondQuickAction() {
         />
         <div className="min-w-0">
           <p className="text-base font-extrabold uppercase tracking-wide text-[color:var(--severity-critical)]">
-            Active Alert
+            Active Alert · {alertEvent}
           </p>
           <p className="mt-1 text-sm font-medium text-foreground/85">
             Follow the safe route and avoid marked danger areas.
           </p>
         </div>
+
       </div>
 
       {/* Real-time location status */}
