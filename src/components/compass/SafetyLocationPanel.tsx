@@ -684,49 +684,88 @@ export function SafetyLocationPanel() {
     setSetupStep("review");
   }
 
-  function generatePlan() {
+  async function generatePlan() {
     if (!draftLocationId) return;
     const locId = draftLocationId;
     const { overall, hazardScores, gaps } = computeScores(answers, skipped);
-    const routes = genericRoutes(draftName, draftArea);
+
+    // Move into the generating step with a live progress bar.
+    setSetupStep("generating");
+    setGenProgress(5);
+    setGenStatus("Analyzing your location…");
+
+    // Resolve coordinates (use draftGeo from autocomplete if available).
+    let geo: GeocodeResult | null = draftGeo;
+    const area = draftArea.trim();
+    if (!geo && area) {
+      try {
+        geo = await forwardGeocode(area);
+      } catch {
+        geo = null;
+      }
+    }
+    setGenProgress(25);
+    setGenStatus("Mapping hazards near you…");
+
+    // Kick off AI plan generation while we animate progress through hazards.
+    const aiPromise = generateCompassPlan({
+      data: {
+        locationName: draftName.trim() || "My location",
+        locationType: draftType,
+        address: area || draftName,
+        city: geo?.city ?? undefined,
+        state: geo?.state ?? undefined,
+        country: geo?.country ?? undefined,
+        lat: geo?.lat,
+        lng: geo?.lng,
+      },
+    }).catch(() => null);
+
+    const hazardLabels = ["Flood", "Earthquake", "Extreme Heat", "Hurricane", "Wildfire", "Winter Storm"];
+    for (let i = 0; i < hazardLabels.length; i++) {
+      setGenStatus(`Generating ${hazardLabels[i]} route…`);
+      setGenProgress(25 + Math.round(((i + 1) / hazardLabels.length) * 60));
+      await new Promise((r) => setTimeout(r, 350));
+    }
+
+    setGenStatus("Finalizing your Compass Plan…");
+    const aiResult = await aiPromise;
+    const routes: RoutePlan[] = aiResult?.routes?.length
+      ? (aiResult.routes as RoutePlan[])
+      : genericRoutes(draftName, draftArea);
+    setGenProgress(100);
+
     setLocations((ls) =>
       ls.map((l) =>
         l.id === locId
           ? {
               ...l,
               ready: true,
+              area: area || l.area,
               answers,
               skipped,
               routes,
               readinessScore: overall,
               hazardScores,
               gaps,
+              ...(geo ? { geo } : {}),
             }
           : l,
       ),
     );
-    setSetupStep("generated");
 
-    // Resolve the typed address to coordinates so the rest of the app (rollup,
-    // snapshots, risk map) follows this location. The confirm effect picks up
-    // `geo` once it lands; if geocoding fails we still confirm via `ready`.
-    const area = draftArea.trim();
-    if (area) {
-      forwardGeocode(area)
-        .then((geo) => {
-          if (!geo) return;
-          setLocations((ls) => ls.map((l) => (l.id === locId ? { ...l, geo } : l)));
-        })
-        .catch(() => {
-          /* offline / geocode failure — keep the readiness plan without geo */
-        });
-    }
+    // Brief pause so the user sees 100% before the results screen.
+    await new Promise((r) => setTimeout(r, 400));
+    setSetupStep("generated");
   }
 
   function closeAfterResults() {
     setSetupMode(null);
     setSetupStep("name");
     setDraftLocationId(null);
+    setDraftGeo(null);
+    setGenProgress(0);
+    setGenStatus("");
     setAnswers(blankAnswers());
     setSkipped(blankSkipped());
     setWizardIndex(0);
