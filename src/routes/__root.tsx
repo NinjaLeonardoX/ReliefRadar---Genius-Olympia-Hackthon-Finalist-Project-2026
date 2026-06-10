@@ -14,7 +14,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppFooter } from "../components/AppFooter";
 import { AppSidebar } from "../components/AppSidebar";
-import { ScenarioProvider, useScenario } from "../components/ScenarioContext";
+import { ScenarioProvider } from "../components/ScenarioContext";
+import { PhaseProvider } from "../components/PhaseContext";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useRouterState } from "@tanstack/react-router";
 
@@ -160,7 +161,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ScenarioProvider>
-        <AppChrome />
+        <PhaseProvider>
+          <AppChrome />
+        </PhaseProvider>
       </ScenarioProvider>
     </QueryClientProvider>
   );
