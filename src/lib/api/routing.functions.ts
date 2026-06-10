@@ -41,11 +41,11 @@ export const fetchRoutes = createServerFn({ method: "POST" })
       avoidPolygon: z.array(z.array(lngLat)),
     }),
   )
-  .handler(async ({ data }): Promise<OrsResponse> => {
+  .handler(async ({ data }): Promise<OrsResponse | null> => {
     const key = process.env.ORS_API_KEY;
     if (!key) {
       console.info("[routing] ORS_API_KEY absent — falling back to seed routes.");
-      throw new Error("ORS_API_KEY not configured");
+      return null;
     }
 
     // NOTE: ORS rejects `alternative_routes` when combined with
@@ -71,7 +71,7 @@ export const fetchRoutes = createServerFn({ method: "POST" })
     if (!res.ok) {
       const body = await res.text().catch(() => "");
       console.info(`[routing] ORS ${res.status} — falling back to seed routes.`, body);
-      throw new Error(`ORS request failed: ${res.status}`);
+      return null;
     }
     return (await res.json()) as OrsResponse;
   });
