@@ -47,7 +47,7 @@ function LandingPage() {
 
         {/* HERO */}
         <section className="mx-auto max-w-7xl px-6 pt-12 pb-4 lg:pt-20 lg:pb-6">
-          <div className="grid items-center gap-14 lg:grid-cols-12">
+          <div className="grid items-stretch gap-14 lg:grid-cols-12">
             <div className="lg:col-span-7">
 
               <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
