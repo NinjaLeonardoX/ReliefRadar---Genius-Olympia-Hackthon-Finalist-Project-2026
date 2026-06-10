@@ -166,6 +166,8 @@ export function PreparePhase() {
         </div>
       </section>
 
+      <RollupPanel />
+
       {/* 2 · ROUTE READINESS */}
       <RouteReadinessPanel hazard={selectedHazard} />
 
